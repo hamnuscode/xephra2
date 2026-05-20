@@ -153,7 +153,7 @@ const DashboardAdmin = ({ setActiveMenu }) => {
       <div
         className="rounded-xl p-8"
         style={{
-          background: "linear-gradient(135deg, rgba(0,229,255,0.06) 0%, rgba(109,40,217,0.06) 100%)",
+          background: "#111827",
           border: "1px solid rgba(0,229,255,0.12)",
         }}
       >
@@ -217,7 +217,7 @@ const DashboardAdmin = ({ setActiveMenu }) => {
                       />
                       <div
                         className="absolute inset-0"
-                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                        style={{ background: "rgba(10,14,39,0.55)" }}
                       />
                       <div className="absolute bottom-0 left-0 right-0 p-3">
                         <h3
@@ -263,7 +263,7 @@ const DashboardAdmin = ({ setActiveMenu }) => {
                       />
                       <div
                         className="absolute inset-0"
-                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                        style={{ background: "rgba(10,14,39,0.55)" }}
                       />
                       <div className="absolute bottom-0 left-0 right-0 p-3">
                         <h3
@@ -327,7 +327,7 @@ const DashboardAdmin = ({ setActiveMenu }) => {
                           className="h-full rounded-full"
                           style={{
                             width: `${progress}%`,
-                            background: "linear-gradient(90deg, #00E5FF, #6D28D9)",
+                            background: "#00E5FF",
                           }}
                         />
                       </div>

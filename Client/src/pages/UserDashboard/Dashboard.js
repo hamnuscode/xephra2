@@ -33,7 +33,7 @@ function Sidebar({ onMenuClick, activeMenu }) {
       {/* Logo */}
       <div className="px-6 py-5" style={{ borderBottom: "1px solid rgba(75,85,99,0.15)" }}>
         <Link to="/" className="flex items-center">
-          <img src={logo} className="h-8 w-auto" alt="Xephra" />
+          <img src={logo} className="h-8 w-auto" alt="Rival" />
         </Link>
       </div>
 

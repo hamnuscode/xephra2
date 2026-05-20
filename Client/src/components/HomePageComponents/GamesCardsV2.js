@@ -71,7 +71,7 @@ const GamesCardsV2 = () => {
               <div
                 className="absolute inset-0 transition-opacity duration-200"
                 style={{
-                  background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, rgba(10,14,39,0.3) 50%, transparent 100%)",
+                  background: "rgba(10,14,39,0.55)",
                 }}
               />
               {/* Cyan border on hover */}

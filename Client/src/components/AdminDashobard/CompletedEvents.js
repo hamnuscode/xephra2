@@ -67,7 +67,7 @@ function TournamentCard({ _id, title, game, gameMode, date, time, description, i
         />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+          style={{ background: "rgba(10,14,39,0.55)" }}
         />
         <div
           className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold"

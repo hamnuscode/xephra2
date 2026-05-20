@@ -66,7 +66,7 @@ const AllUserRankingUser = ({ dark }) => {
   return (
     <div className="min-h-screen p-8 bg-[#875441] shadow-2xl shadow-gray-950  backdrop-blur-sm">
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
-        Xephra Users Ranking Board
+        Rival Users Ranking Board
       </h1>
 
       <div className="grid">

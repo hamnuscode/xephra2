@@ -256,7 +256,7 @@ function TournamentCard({ _id, title, game, gameMode, date, time, description, i
         <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+          style={{ background: "rgba(10,14,39,0.55)" }}
         />
         <div className="absolute bottom-0 left-0 right-0 p-3">
           <h3

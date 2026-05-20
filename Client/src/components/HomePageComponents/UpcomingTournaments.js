@@ -91,7 +91,7 @@ const UpcomingTournaments = () => {
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: "linear-gradient(to top, rgba(10,14,39,0.98) 0%, rgba(10,14,39,0.3) 60%, transparent 100%)",
+                    background: "rgba(10,14,39,0.55)",
                   }}
                 />
                 {/* Purple hover border */}

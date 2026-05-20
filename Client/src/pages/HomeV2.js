@@ -153,37 +153,11 @@ const HomeV2 = () => {
       {/* ── Hero Section ──────────────────────────── */}
       <section
         id="hero-section"
-        className="relative min-h-[92vh] flex items-center px-6 overflow-hidden"
+        className="min-h-[92vh] flex items-center px-6"
+        style={{ background: "#0A0E1A", borderBottom: "1px solid #1E2A3A" }}
       >
-        {/* Background layers */}
-        <div className="absolute inset-0">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "linear-gradient(135deg, #0A0E27 0%, #0d1245 40%, #0A0E27 100%)",
-            }}
-          />
-          {/* Cyan glow top-right */}
-          <div
-            className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 65%)" }}
-          />
-          {/* Purple glow bottom-left */}
-          <div
-            className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none"
-            style={{ background: "radial-gradient(circle, rgba(109,40,217,0.1) 0%, transparent 65%)" }}
-          />
-          {/* Grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: "linear-gradient(rgba(0,229,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,1) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
-        </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto w-full py-24">
+        <div className="max-w-7xl mx-auto w-full py-24">
           <div className="max-w-3xl">
             {/* Tag */}
             <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold tracking-widest uppercase"
@@ -253,11 +227,6 @@ const HomeV2 = () => {
           </div>
         </div>
 
-        {/* Bottom fade */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={{ background: "linear-gradient(to bottom, transparent, #0A0E27)" }}
-        />
       </section>
 
       {/* ── Games Section ─────────────────────────── */}

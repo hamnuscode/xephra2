@@ -105,8 +105,8 @@ export default function PricesV2() {
                   <span
                     className="px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
                     style={{
-                      background: "linear-gradient(135deg, #6D28D9, #00E5FF)",
-                      color: "#fff",
+                      background: "#00E5FF",
+                      color: "#0A0E1A",
                       fontFamily: "IBM Plex Mono, monospace",
                     }}
                   >
@@ -166,7 +166,7 @@ export default function PricesV2() {
                 className="w-full py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-150"
                 style={{
                   background: plan.popular
-                    ? "linear-gradient(135deg, #6D28D9, #00E5FF)"
+                    ? "#00E5FF"
                     : `${plan.accent}18`,
                   border: `1px solid ${plan.accent}50`,
                   color: plan.popular ? "#fff" : plan.accent,

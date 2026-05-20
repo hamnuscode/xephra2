@@ -22,22 +22,13 @@ const ForgetPassword = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1340 50%, #0A0E27 100%)" }}
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: "#0A0E1A" }}
     >
-      <div
-        className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%)" }}
-      />
-      <div
-        className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(109,40,217,0.08) 0%, transparent 70%)" }}
-      />
-
-      <div className="w-full max-w-sm relative z-10 animate-fade-in">
+      <div className="w-full max-w-sm animate-fade-in">
         <div className="flex justify-center mb-8">
           <Link to="/">
-            <img src={logo} alt="Xephra" className="h-10 w-auto" />
+            <img src={logo} alt="Rival" className="h-10 w-auto" />
           </Link>
         </div>
 

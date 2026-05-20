@@ -536,7 +536,7 @@ const EventDetailUser = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <input
                         type="text"
-                        placeholder={`Your Xephra ID: ${userXephraId}`}
+                        placeholder={`Your Rival ID: ${userXephraId}`}
                         value={userXephraId}
                         disabled={true}
                         className="px-3 py-2 bg-[#1a1a1a] border border-[#666] rounded-md text-[#888] cursor-not-allowed text-sm"
@@ -578,7 +578,7 @@ const EventDetailUser = () => {
                       <div className="space-y-2">
                         <input
                           type="text"
-                          placeholder={`Xephra ID: ${userXephraId}`}
+                          placeholder={`Rival ID: ${userXephraId}`}
                           value={userXephraId}
                           disabled={true}
                           className="w-full px-3 py-1.5 bg-[#1a1a1a] border border-[#666] rounded text-[#888] cursor-not-allowed text-sm"
@@ -613,7 +613,7 @@ const EventDetailUser = () => {
                       <div className="space-y-2">
                         <input
                           type="text"
-                          placeholder="Xephra ID"
+                          placeholder="Rival ID"
                           value={teamMembers[0]?.xephraId || ''}
                           onChange={(e) => handleTeamMemberChange(0, 'xephraId', e.target.value)}
                           className="w-full px-3 py-1.5 bg-[#1a1a1a] border border-[#666] rounded text-[#C9B796] focus:outline-none focus:border-[#D19F43] text-sm"
@@ -649,7 +649,7 @@ const EventDetailUser = () => {
                       <div className="space-y-2">
                         <input
                           type="text"
-                          placeholder={`Xephra ID: ${userXephraId}`}
+                          placeholder={`Rival ID: ${userXephraId}`}
                           value={userXephraId}
                           disabled={true}
                           className="w-full px-3 py-1.5 bg-[#1a1a1a] border border-[#666] rounded text-[#888] cursor-not-allowed text-sm"
@@ -685,7 +685,7 @@ const EventDetailUser = () => {
                         <div className="space-y-2">
                           <input
                             type="text"
-                            placeholder="Xephra ID"
+                            placeholder="Rival ID"
                             value={teamMembers[index]?.xephraId || ''}
                             onChange={(e) => handleTeamMemberChange(index, 'xephraId', e.target.value)}
                             className="w-full px-3 py-1.5 bg-[#1a1a1a] border border-[#666] rounded text-[#C9B796] focus:outline-none focus:border-[#D19F43] text-sm"

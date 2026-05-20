@@ -105,12 +105,12 @@ const AdminProfile = ({ profile }) => {
       {/* Banner + Avatar */}
       <div
         className="relative rounded-xl overflow-hidden"
-        style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(109,40,217,0.12) 100%)", border: "1px solid rgba(0,229,255,0.15)", paddingBottom: 60 }}
+        style={{ background: "#111827", border: "1px solid #1E2A3A", paddingBottom: 60 }}
       >
         {/* Banner area */}
         <div
           className="h-32 w-full"
-          style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(109,40,217,0.18) 100%)" }}
+          style={{ background: "#0D1424", borderBottom: "1px solid #1E2A3A" }}
         />
 
         {/* Avatar */}

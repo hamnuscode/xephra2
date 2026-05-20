@@ -123,12 +123,12 @@ const UserProfile = ({ profile }) => {
       <div
         className="relative rounded-xl overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(109,40,217,0.12) 100%)",
-          border: "1px solid rgba(0,229,255,0.15)",
+          background: "#111827",
+          border: "1px solid #1E2A3A",
           paddingBottom: 64,
         }}
       >
-        <div className="h-32 w-full" style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(109,40,217,0.18) 100%)" }} />
+        <div className="h-32 w-full" style={{ background: "#0D1424", borderBottom: "1px solid #1E2A3A" }} />
 
         {/* Stats badges */}
         <div className="absolute top-3 right-4 flex flex-col items-end gap-1.5">
@@ -136,7 +136,7 @@ const UserProfile = ({ profile }) => {
             className="px-3 py-1 rounded-full text-xs font-semibold"
             style={{ background: "rgba(0,0,0,0.4)", color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" }}
           >
-            Xephra ID: {userId || "N/A"}
+            Rival ID: {userId || "N/A"}
           </div>
           <div
             className="px-3 py-1 rounded-full text-xs font-semibold"

@@ -222,7 +222,7 @@ const TournamentCard = ({ _id, title, game, gameMode, date, time, description, i
           />
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+            style={{ background: "rgba(10,14,39,0.55)" }}
           />
           {date && (
             <div

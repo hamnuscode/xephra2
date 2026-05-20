@@ -134,7 +134,7 @@ const RankingBoard = () => {
                           className="h-full rounded-full"
                           style={{
                             width: `${progress}%`,
-                            background: "linear-gradient(90deg, #00E5FF, #6D28D9)",
+                            background: "#00E5FF",
                           }}
                         />
                       </div>

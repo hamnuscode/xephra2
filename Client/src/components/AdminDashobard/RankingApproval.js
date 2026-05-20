@@ -59,7 +59,7 @@ const RankingApproval = () => {
               />
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, rgba(10,14,39,0.2) 60%, transparent 100%)" }}
+                style={{ background: "rgba(10,14,39,0.55)" }}
               />
               <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
