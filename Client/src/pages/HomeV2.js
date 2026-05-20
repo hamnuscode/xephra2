@@ -6,6 +6,7 @@ import UpcomingTournaments from "../components/HomePageComponents/UpcomingTourna
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
 import HeroGFX from "../components/HomePageComponents/HeroGFX";
+import PlatformFeatures from "../components/HomePageComponents/PlatformFeatures";
 import { logout } from "../redux/features/authSlice";
 import { useDispatch } from "react-redux";
 
@@ -17,13 +18,14 @@ const HomeV2 = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const navItems = ["Home", "Games", "Tournaments", "Prices"];
+  const navItems = ["Home", "Features", "Games", "Tournaments", "Prices"];
 
   const handleNavClick = (item) => {
     setActiveNav(item);
     setIsMenuOpen(false);
     const sectionMap = {
       Home: "hero-section",
+      Features: "features-section",
       Games: "games-section",
       Tournaments: "tournaments-section",
       Prices: "prices-section",
@@ -267,6 +269,11 @@ const HomeV2 = () => {
         </div>
 
       </section>
+
+      {/* ── Platform Features Section ─────────────── */}
+      <div id="features-section">
+        <PlatformFeatures />
+      </div>
 
       {/* ── Games Section ─────────────────────────── */}
       <div id="games-section">
