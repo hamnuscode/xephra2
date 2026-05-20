@@ -154,7 +154,7 @@ const HomeV2 = () => {
       <section
         id="hero-section"
         className="min-h-[92vh] flex items-center px-6"
-        style={{ background: "#0A0E1A", borderBottom: "1px solid #1E2A3A" }}
+        style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1245 40%, #0A0E27 100%)", borderBottom: "1px solid #1E2A3A" }}
       >
 
         <div className="max-w-7xl mx-auto w-full py-24">

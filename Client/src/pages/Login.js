@@ -19,8 +19,22 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const DEMO_ACCOUNTS = {
+    "admin@rival.com": { password: "Admin@123", role: "admin", name: "Demo Admin", UserId: "demo_admin_001" },
+    "user@rival.com":  { password: "User@123",  role: "user",  name: "Demo User",  UserId: "demo_user_001" },
+  };
+
   const HandleFormSubmit = (e) => {
     e.preventDefault();
+    const demo = DEMO_ACCOUNTS[formData.email];
+    if (demo && demo.password === formData.password) {
+      const fakeUser = { name: demo.name, UserId: demo.UserId, email: formData.email, role: demo.role, isVerified: true };
+      localStorage.setItem("user", JSON.stringify(fakeUser));
+      localStorage.setItem("token", `demo_token_${demo.role}`);
+      localStorage.setItem("isAuthenticated", "true");
+      navigate(demo.role === "admin" ? "/dashboard" : "/userdashboard");
+      return;
+    }
     dispatch(LoginUser(formData)).then((action) => {
       if (LoginUser.fulfilled.match(action)) {
         if (action?.payload?.user?.role === "admin") {
@@ -185,6 +199,16 @@ const Login = () => {
             <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
             Continue with Google
           </button>
+
+          {/* Demo credentials */}
+          <div
+            className="mt-6 p-4 rounded-lg text-xs space-y-1"
+            style={{ background: "rgba(0,229,255,0.05)", border: "1px solid rgba(0,229,255,0.15)", fontFamily: "IBM Plex Mono, monospace", color: "#9CA3AF" }}
+          >
+            <p style={{ color: "#00E5FF", marginBottom: 6, fontSize: 11, letterSpacing: "0.05em" }}>DEMO CREDENTIALS</p>
+            <p><span style={{ color: "#F8F9FA" }}>Admin</span> — admin@rival.com / Admin@123</p>
+            <p><span style={{ color: "#F8F9FA" }}>User</span>  — user@rival.com / User@123</p>
+          </div>
 
           <div className="mt-6 space-y-2 text-center">
             <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
