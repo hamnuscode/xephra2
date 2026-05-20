@@ -5,6 +5,7 @@ import GamesCardsV2 from "../components/HomePageComponents/GamesCardsV2";
 import UpcomingTournaments from "../components/HomePageComponents/UpcomingTournaments";
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
+import HeroGFX from "../components/HomePageComponents/HeroGFX";
 import { logout } from "../redux/features/authSlice";
 import { useDispatch } from "react-redux";
 
@@ -153,76 +154,105 @@ const HomeV2 = () => {
       {/* ── Hero Section ──────────────────────────── */}
       <section
         id="hero-section"
-        className="min-h-[92vh] flex items-center px-6"
+        className="relative min-h-[92vh] flex items-center px-6 overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1245 40%, #0A0E27 100%)", borderBottom: "1px solid #1E2A3A" }}
       >
+        {/* Animated grid background */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(rgba(0,229,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.045) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+            animation: "gridScroll 8s linear infinite",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Edge fade */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(10,14,39,0.85) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
 
-        <div className="max-w-7xl mx-auto w-full py-24">
-          <div className="max-w-3xl">
-            {/* Tag */}
-            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold tracking-widest uppercase"
-              style={{
-                background: "rgba(0, 229, 255, 0.08)",
-                border: "1px solid rgba(0, 229, 255, 0.2)",
-                color: "#00E5FF",
-                fontFamily: "IBM Plex Mono, monospace",
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-pulse" />
-              #1 Gaming Arena
-            </div>
-
-            {/* Headline */}
-            <h1
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6"
-              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA", letterSpacing: "-0.02em" }}
-            >
-              Where Gamers
-              <br />
-              <span style={{ color: "#00E5FF" }}>Compete</span>
-              <br />
-              For Glory
-            </h1>
-
-            <p
-              className="text-lg sm:text-xl mb-10 max-w-lg"
-              style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", lineHeight: 1.7 }}
-            >
-              Enter the tournament arena. Compete against the best. Climb the ranks. Claim your prize.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-4">
-              <Link to="/signup" className="btn-primary py-4 px-8 text-base">
-                Enter The Arena
-              </Link>
-              <button
-                onClick={() => handleNavClick("Tournaments")}
-                className="btn-secondary py-4 px-8 text-base"
+        <div className="relative max-w-7xl mx-auto w-full py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left — text content */}
+            <div>
+              {/* Tag */}
+              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold tracking-widest uppercase"
+                style={{
+                  background: "rgba(0, 229, 255, 0.08)",
+                  border: "1px solid rgba(0, 229, 255, 0.2)",
+                  color: "#00E5FF",
+                  fontFamily: "IBM Plex Mono, monospace",
+                }}
               >
-                View Tournaments
-              </button>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-pulse" />
+                #1 Gaming Arena
+              </div>
+
+              {/* Headline */}
+              <h1
+                className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6"
+                style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA", letterSpacing: "-0.02em" }}
+              >
+                Where Gamers
+                <br />
+                <span style={{ color: "#00E5FF" }}>Compete</span>
+                <br />
+                For Glory
+              </h1>
+
+              <p
+                className="text-lg sm:text-xl mb-10 max-w-lg"
+                style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", lineHeight: 1.7 }}
+              >
+                Enter the tournament arena. Compete against the best. Climb the ranks. Claim your prize.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4">
+                <Link to="/signup" className="btn-primary py-4 px-8 text-base">
+                  Enter The Arena
+                </Link>
+                <button
+                  onClick={() => handleNavClick("Tournaments")}
+                  className="btn-secondary py-4 px-8 text-base"
+                >
+                  View Tournaments
+                </button>
+              </div>
+
+              {/* Stats */}
+              <div className="flex flex-wrap gap-8 mt-16">
+                {[
+                  { value: "500+", label: "Active Players" },
+                  { value: "50+", label: "Tournaments Held" },
+                  { value: "PKR 1M+", label: "Prize Pool" },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <div
+                      className="text-3xl font-bold"
+                      style={{ fontFamily: "IBM Plex Mono, monospace", color: "#00E5FF" }}
+                    >
+                      {stat.value}
+                    </div>
+                    <div className="text-sm mt-1" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-wrap gap-8 mt-16">
-              {[
-                { value: "500+", label: "Active Players" },
-                { value: "50+", label: "Tournaments Held" },
-                { value: "PKR 1M+", label: "Prize Pool" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div
-                    className="text-3xl font-bold"
-                    style={{ fontFamily: "IBM Plex Mono, monospace", color: "#00E5FF" }}
-                  >
-                    {stat.value}
-                  </div>
-                  <div className="text-sm mt-1" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+            {/* Right — animated 3D GFX */}
+            <div className="hidden lg:block" style={{ height: 520 }}>
+              <HeroGFX />
             </div>
           </div>
         </div>
