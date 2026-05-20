@@ -1,331 +1,281 @@
 import React, { useState } from "react";
-import { Search, User, Bell } from "lucide-react";
 import logo from "../assets/xephra logo-01.png";
 import { Link, useNavigate } from "react-router-dom";
-import { IoMoonSharp } from "react-icons/io5";
-import { ImBrightnessContrast } from "react-icons/im";
 import GamesCardsV2 from "../components/HomePageComponents/GamesCardsV2";
 import UpcomingTournaments from "../components/HomePageComponents/UpcomingTournaments";
 import PricesV2 from "../components/HomePageComponents/PricesV2";
 import Footer from "../components/HomePageComponents/Footer";
 import { logout } from "../redux/features/authSlice";
-import { useDispatch, useSelector } from "react-redux";
-import Bg1 from "../assets/homepage/homebg1.webp";
-import Bg2 from "../assets/homepage/homebg2.webp";
-import Bg3 from "../assets/homepage/homebg3.webp";
-import Bg4 from "../assets/homepage/homebg4.webp";
-import Bg5 from "../assets/homepage/homebg5.webp";
+import { useDispatch } from "react-redux";
 
 const HomeV2 = () => {
   const [activeNav, setActiveNav] = useState("Home");
-  const [dark, setDark] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isAuthenticated = localStorage.getItem("isAuthenticated");
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  const toggleTheme = () => setDark(!dark);
+  const navItems = ["Home", "Games", "Tournaments", "Prices"];
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  // Function to handle navigation and scrolling
   const handleNavClick = (item) => {
     setActiveNav(item);
-    setIsMenuOpen(false); // Close mobile menu if open
-
-    // Scroll to respective sections
+    setIsMenuOpen(false);
     const sectionMap = {
       Home: "hero-section",
       Games: "games-section",
       Tournaments: "tournaments-section",
       Prices: "prices-section",
-      Footer: "footer-section",
     };
-
-    const sectionId = sectionMap[item];
-    if (sectionId) {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }
+    const el = document.getElementById(sectionMap[item]);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const navItems = ["Home", "Games", "Tournaments", "Prices"];
-
   const logoutSubmit = () => {
-      dispatch(logout());
-      navigate("/login");
-    };
+    dispatch(logout());
+    navigate("/login");
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Background with character silhouettes */}
-      <div className="absolute inset-0">
-        {/* Main background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-orange-600/20"></div>
-
-        {/* Character silhouettes */}
-        <div className="absolute top-0 right-0 w-full h-full">
-          {/* Main character silhouette - right side */}
-          <div className="absolute top-10 right-10 w-80 h-96 opacity-60">
-            <div className="w-full h-full bg-gradient-to-b from-gray-800/80 via-gray-700/60 to-transparent rounded-lg transform rotate-3"></div>
-            <div className="absolute top-8 right-4 w-16 h-24 bg-orange-500/40 rounded-full blur-sm"></div>
-            <div className="absolute top-20 right-8 w-12 h-20 bg-blue-400/30 rounded-lg blur-sm"></div>
-          </div>
-
-          {/* Secondary characters */}
-          <div className="absolute top-16 right-40 w-48 h-64 opacity-40">
-            <div className="w-full h-full bg-gradient-to-b from-gray-600/60 via-gray-500/40 to-transparent rounded-lg transform -rotate-2"></div>
-          </div>
-
-          <div className="absolute top-8 right-80 w-32 h-48 opacity-30">
-            <div className="w-full h-full bg-gradient-to-b from-gray-500/50 via-gray-400/30 to-transparent rounded-lg transform rotate-1"></div>
-          </div>
-        </div>
-
-        {/* Left side character silhouettes */}
-        <div className="absolute top-20 left-0 w-64 h-80 opacity-20">
-          <div className="w-full h-full bg-gradient-to-b from-gray-600/40 via-gray-500/20 to-transparent rounded-lg transform -rotate-6"></div>
-        </div>
-      </div>
-
-      {/* Header - Responsive for screens below 450px */}
-      <header className="relative z-20 px-4 sm:px-8 py-2 sm:py-4 bg-[#292622c4] backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo (Left) - Smaller on mobile */}
-          <Link
-            to="/"
-            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
-          >
-            <img
-              src={logo}
-              alt="XEPHRA Logo"
-              className="h-8 w-24 sm:h-12 sm:w-40"
-            />
+    <div className="min-h-screen" style={{ background: "#0A0E27" }}>
+      {/* ── Header ─────────────────────────────────── */}
+      <header
+        className="sticky top-0 z-50 h-16 px-6 flex items-center"
+        style={{
+          background: "rgba(10, 14, 39, 0.95)",
+          borderBottom: "1px solid rgba(0, 229, 255, 0.12)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <img src={logo} alt="Xephra" className="h-8 w-auto" />
           </Link>
 
-          {/* Nav (Center) - Hidden on very small screens */}
-          <nav className="hidden lg:flex space-x-8 absolute left-1/2 transform -translate-x-1/2">
+          {/* Nav — desktop */}
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <button
                 key={item}
                 onClick={() => handleNavClick(item)}
-                className={`block font-montserrat font-semibold transition-colors duration-200 ${
-                  activeNav === item
-                    ? "text-white"
-                    : "text-[#D4AD66] hover:text-[#f0cc88]"
-                }`}
+                className="nav-item text-sm"
+                style={activeNav === item ? { color: "#00E5FF", borderBottomColor: "#00E5FF" } : {}}
               >
                 {item}
               </button>
             ))}
           </nav>
 
-          {/* Right Icons and Username - Compact on mobile */}
-          <div className="flex items-center space-x-2 sm:space-x-6">
-            {/* Dark Mode Toggle - Smaller on mobile */}
-            <button
-              onClick={toggleTheme}
-              className="p-1 text-white rounded-full focus:outline-none hover:bg-gray-400 dark:text-gray-300 dark:hover:bg-gray-700"
-              aria-label="Toggle Dark Mode"
-            >
-              {dark ? (
-                <ImBrightnessContrast className="text-[#C9B796] w-4 h-4 sm:w-5 sm:h-5" />
-              ) : (
-                <IoMoonSharp className="text-[#C9B796] w-4 h-4 sm:w-5 sm:h-5" />
-              )}
-            </button>
-
-            <div className="flex md:order-2 space-x-2 sm:space-x-3 lg:space-x-2 rtl:space-x-reverse">
-
-              {isAuthenticated ? (
-                <>
-                  {user && user.role === "admin" ? (
-                    <Link
-                      to="/dashboard"
-                      type="button"
-                      className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
-                    >
-                      Dashboard
-                    </Link>
-                  ) : (
-                    <Link
-                      to="/userdashboard"
-                      type="button"
-                      className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
-                    >
-                      Dashboard
-                    </Link>
-                  )}
-                  {/* Logout Button - Only show on sm and up */}
-                  <button
-                    onClick={logoutSubmit}
-                    type="button"
-                    className="ml-2 text-white font-montserrat bg-red-500 hover:bg-red-600 focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-red-500 dark:hover:bg-red-600 hidden sm:flex"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/signup"
-                    type="button"
-                    className="text-white font-montserrat bg-[#b7a692] hover:bg-[#b9ac9b] focus:outline-none font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-2 text-center flex items-center justify-center dark:bg-[#b7a692] dark:bg-[#b7a692]-700 dark:focus:bg-[#b7a692]"
-                  >
-                    Get started
-                  </Link>
-                </>
-              )}
-
-              <button
-                onClick={toggleMenu}
-                type="button"
-                className="inline-flex items-center p-1 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 justify-center text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                aria-controls="navbar-cta"
-                aria-expanded={isMenuOpen ? "true" : "false"}
-              >
-                <span className="sr-only">Open main menu</span>
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 17 14"
+          {/* Right actions */}
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to={user?.role === "admin" ? "/dashboard" : "/userdashboard"}
+                  className="btn-primary py-2 px-4 text-sm"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M1 1h15M1 7h15M1 13h15"
-                  />
-                </svg>
-              </button>
-            </div>
+                  Dashboard
+                </Link>
+                <button
+                  onClick={logoutSubmit}
+                  className="hidden sm:block btn-ghost py-2 px-4 text-sm"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn-ghost py-2 px-4 text-sm hidden sm:block">
+                  Sign in
+                </Link>
+                <Link to="/signup" className="btn-primary py-2 px-4 text-sm">
+                  Get started
+                </Link>
+              </>
+            )}
+
+            {/* Hamburger */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-md transition-colors"
+              style={{ color: "#9CA3AF" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Nav Menu */}
+      {/* Mobile nav */}
       {isMenuOpen && (
-        <nav className="lg:hidden z-30 bg-[#292622c4] backdrop-blur-sm px-4 sm:px-8 py-4 space-y-4">
+        <div
+          className="lg:hidden sticky top-16 z-40 px-6 py-4 space-y-1"
+          style={{
+            background: "rgba(10, 14, 39, 0.98)",
+            borderBottom: "1px solid rgba(0, 229, 255, 0.1)",
+          }}
+        >
           {navItems.map((item) => (
             <button
               key={item}
               onClick={() => handleNavClick(item)}
-              className={`block w-full text-left font-montserrat font-semibold text-base sm:text-lg transition-colors duration-200 ${
-                activeNav === item
-                  ? "text-white"
-                  : "text-[#D4AD66] hover:text-[#f0cc88]"
-              }`}
+              className="block w-full text-left px-4 py-3 rounded-md text-sm font-medium transition-colors"
+              style={{
+                color: activeNav === item ? "#00E5FF" : "#9CA3AF",
+                background: activeNav === item ? "rgba(0, 229, 255, 0.06)" : "transparent",
+                fontFamily: "Inter, sans-serif",
+              }}
             >
               {item}
             </button>
           ))}
-          {/* Logout Button in mobile nav */}
           {isAuthenticated && (
             <button
               onClick={logoutSubmit}
-              type="button"
-              className="block w-full text-left font-montserrat font-semibold text-base text-red-500 hover:text-red-600 transition-colors duration-200 sm:hidden"
+              className="block w-full text-left px-4 py-3 rounded-md text-sm font-medium transition-colors"
+              style={{ color: "#EF4444", fontFamily: "Inter, sans-serif" }}
             >
               Logout
             </button>
           )}
-        </nav>
+        </div>
       )}
 
-      {/* Hero Section */}
+      {/* ── Hero Section ──────────────────────────── */}
       <section
         id="hero-section"
-        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-4 sm:px-8 pt-8 md:pt-20 sm:pt-16 pb-8 md:pb-20"
-        style={{
-          backgroundImage: `url(${Bg1})`,
-        }}
+        className="relative min-h-[92vh] flex items-center px-6 overflow-hidden"
       >
-        {/* Gradient Overlay (same as page background) */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-orange-600/20 z-0"></div>
+        {/* Background layers */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: "linear-gradient(135deg, #0A0E27 0%, #0d1245 40%, #0A0E27 100%)",
+            }}
+          />
+          {/* Cyan glow top-right */}
+          <div
+            className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 65%)" }}
+          />
+          {/* Purple glow bottom-left */}
+          <div
+            className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(109,40,217,0.1) 0%, transparent 65%)" }}
+          />
+          {/* Grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(0,229,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,1) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+        </div>
 
-        <div className="max-w-6xl">
-          <div className="mb-4 sm:mb-6">
-            <span className="font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-4 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
+        <div className="relative z-10 max-w-7xl mx-auto w-full py-24">
+          <div className="max-w-3xl">
+            {/* Tag */}
+            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-xs font-semibold tracking-widest uppercase"
+              style={{
+                background: "rgba(0, 229, 255, 0.08)",
+                border: "1px solid rgba(0, 229, 255, 0.2)",
+                color: "#00E5FF",
+                fontFamily: "IBM Plex Mono, monospace",
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-pulse" />
               #1 Gaming Arena
-            </span>
-          </div>
+            </div>
 
-          <div className="space-y-2 mb-8 sm:mb-16">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black leading-none">
-              <span className="font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] mb-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
-                Where Gamers
-              </span>
+            {/* Headline */}
+            <h1
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA", letterSpacing: "-0.02em" }}
+            >
+              Where Gamers
+              <br />
+              <span style={{ color: "#00E5FF" }}>Compete</span>
+              <br />
+              For Glory
             </h1>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black leading-none">
-              <span className="font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] mb-2 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
-                Compete For Glory
-              </span>
-            </h2>
-            <h3 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black leading-none text-[#AC5867] mt-4">
-              Enter The Tournament
-            </h3>
-            <h4 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black leading-none text-[#AC5867]">
-              Arena
-            </h4>
+
+            <p
+              className="text-lg sm:text-xl mb-10 max-w-lg"
+              style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", lineHeight: 1.7 }}
+            >
+              Enter the tournament arena. Compete against the best. Climb the ranks. Claim your prize.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4">
+              <Link to="/signup" className="btn-primary py-4 px-8 text-base">
+                Enter The Arena
+              </Link>
+              <button
+                onClick={() => handleNavClick("Tournaments")}
+                className="btn-secondary py-4 px-8 text-base"
+              >
+                View Tournaments
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="flex flex-wrap gap-8 mt-16">
+              {[
+                { value: "500+", label: "Active Players" },
+                { value: "50+", label: "Tournaments Held" },
+                { value: "PKR 1M+", label: "Prize Pool" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <div
+                    className="text-3xl font-bold"
+                    style={{ fontFamily: "IBM Plex Mono, monospace", color: "#00E5FF" }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="text-sm mt-1" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Bottom fade */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, transparent, #0A0E27)" }}
+        />
       </section>
 
-      <div
-        id="games-section"
-        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
-        style={{
-          backgroundImage: `url(${Bg4})`,
-        }}
-      >
-        {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-orange-600/20 z-0"></div> */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
-
-        <div className="relative z-10">
-          <GamesCardsV2 dark={dark} />
-        </div>
+      {/* ── Games Section ─────────────────────────── */}
+      <div id="games-section">
+        <GamesCardsV2 />
       </div>
 
-      <div
-        id="tournaments-section"
-        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
-        style={{
-          backgroundImage: `url(${Bg5})`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
-
-        <div className="relative z-10">
-          <UpcomingTournaments dark={dark} />
-        </div>
+      {/* ── Tournaments Section ───────────────────── */}
+      <div id="tournaments-section">
+        <UpcomingTournaments />
       </div>
 
-      <div
-        id="prices-section"
-        className="relative z-10 w-full bg-no-repeat bg-cover bg-center px-2 sm:px-2 pt-2 sm:pt-4 pb-2"
-        style={{
-          backgroundImage: `url(${Bg2})`,
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-purple-900/60 to-purple-700/40 z-0"></div>
-
-        <div className="relative z-10">
-          <PricesV2 dark={dark} />
-        </div>
+      {/* ── Prices Section ────────────────────────── */}
+      <div id="prices-section">
+        <PricesV2 />
       </div>
 
-      {/* Footer */}
+      {/* ── Footer ────────────────────────────────── */}
       <div id="footer-section">
         <Footer handleNavClick={handleNavClick} />
       </div>

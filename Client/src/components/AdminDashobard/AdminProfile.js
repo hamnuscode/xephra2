@@ -1,16 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaCamera, FaUser, FaEnvelope, FaCity } from "react-icons/fa";
-import styles from "./AdminProfile.module.css";
-import {
-  updateProfile,
-  createProfile,
-  getProfile,
-} from "../../redux/features/profileSlice";
+import { updateProfile, createProfile, getProfile } from "../../redux/features/profileSlice";
 import Loading from "../../utils/Loading/Loading";
+
 const apiUrl = process.env.REACT_APP_BACKEND;
 
-const AdminProfile = ({ dark, profile }) => {
+const fieldStyle = {
+  background: "rgba(15,23,42,0.8)",
+  border: "1px solid rgba(75,85,99,0.3)",
+  color: "#F8F9FA",
+  borderRadius: 8,
+  padding: "10px 12px",
+  width: "100%",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 14,
+  outline: "none",
+};
+
+const labelStyle = {
+  color: "#9CA3AF",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 13,
+  marginBottom: 4,
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+};
+
+const AdminProfile = ({ profile }) => {
   const { loading } = useSelector((state) => state.profile);
   const dispatch = useDispatch();
 
@@ -30,312 +48,191 @@ const AdminProfile = ({ dark, profile }) => {
     address: "",
   });
   const [profileImageView, setProfileImageView] = useState(null);
-  const [initialProfileData, setInitialProfileData] = useState(null); // Track initial profile data
+  const [initialProfileData, setInitialProfileData] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [message, setMessage] = useState(""); // For displaying the message
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (userId) {
-      dispatch(getProfile(userId)); // Fetch the profile if userId exists
-    }
+    if (userId) dispatch(getProfile(userId));
   }, [dispatch, userId]);
 
   useEffect(() => {
-    // Update profileData when profile state changes
     if (profile) {
-      setProfileData((prevState) => ({
-        ...prevState,
-        ...profile,
-        profileImage: profile.profileImage || prevState.profileImage, // Keep the current image if not provided
-      }));
-
-      setInitialProfileData(profile); // Set the initial profile data
+      setProfileData((prev) => ({ ...prev, ...profile, profileImage: profile.profileImage || prev.profileImage }));
+      setInitialProfileData(profile);
     }
   }, [profile]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData({ ...profileData, [name]: value });
-  };
+  const handleChange = (e) => setProfileData({ ...profileData, [e.target.name]: e.target.value });
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setProfileData({ ...profileData, profileImage: URL.createObjectURL(file) });
     setSelectedFile(file);
-    const profileImage = URL.createObjectURL(file);
-    setProfileImageView(profileImage);
+    setProfileImageView(URL.createObjectURL(file));
   };
 
-  const handleCreate = () => {
-    const formData = new FormData();
-    if (selectedFile) {
-      formData.append("profileImage", selectedFile); // Append profileImage if there's a new file
-    }
-    formData.append("userId", profileData.userId);
-    formData.append("username", profileData.username);
-    formData.append("fullName", profileData.fullName);
-    formData.append("bio", profileData.bio);
-    formData.append("email", profileData.email);
-    formData.append("locationCity", profileData.locationCity);
-    formData.append("locationCountry", profileData.locationCountry);
-    formData.append("phoneNumber", profileData.phoneNumber);
-    formData.append("address", profileData.address);
-
-    dispatch(createProfile(formData)).then(() => {
-      dispatch(getProfile(userId)); // Re-fetch the profile after creating it
-    });
-  };
-
-  const handleUpdate = () => {
-    const formData = new FormData();
-    console.log("selected file", selectedFile);
-    if (selectedFile) {
-      formData.append("profileImage", selectedFile); // Append profileImage if there's a new file
-    }
-    formData.append("userId", profileData.userId);
-    formData.append("username", profileData.username);
-    formData.append("fullName", profileData.fullName);
-    formData.append("bio", profileData.bio);
-    formData.append("email", profileData.email);
-    formData.append("locationCity", profileData.locationCity);
-    formData.append("locationCountry", profileData.locationCountry);
-    formData.append("phoneNumber", profileData.phoneNumber);
-    formData.append("address", profileData.address);
-
-    dispatch(updateProfile({ userId: profileData.userId, formData })).then(
-      () => {
-        dispatch(getProfile(userId)); // Re-fetch the profile after updating it
-      }
+  const buildFormData = () => {
+    const fd = new FormData();
+    if (selectedFile) fd.append("profileImage", selectedFile);
+    ["userId", "username", "fullName", "bio", "email", "locationCity", "locationCountry", "phoneNumber", "address"].forEach(
+      (k) => fd.append(k, profileData[k] || "")
     );
+    return fd;
   };
 
-  const isProfileChanged = () => {
-    return (
-      initialProfileData?.username !== profileData.username ||
-      initialProfileData?.fullName !== profileData.fullName ||
-      initialProfileData?.bio !== profileData.bio ||
-      initialProfileData?.email !== profileData.email ||
-      initialProfileData?.phoneNumber !== profileData.phoneNumber ||
-      initialProfileData?.address !== profileData.address ||
-      initialProfileData?.locationCity !== profileData.locationCity ||
-      initialProfileData?.locationCountry !== profileData.locationCountry ||
-      initialProfileData?.profileImage !== profileData.profileImage
-    );
-  };
+  const handleCreate = () => dispatch(createProfile(buildFormData())).then(() => dispatch(getProfile(userId)));
+
+  const handleUpdate = () =>
+    dispatch(updateProfile({ userId: profileData.userId, formData: buildFormData() })).then(() => dispatch(getProfile(userId)));
+
+  const isProfileChanged = () =>
+    initialProfileData && Object.keys(profileData).some((k) => initialProfileData[k] !== profileData[k]);
 
   const handleProfileUpdateClick = () => {
     if (!isProfileChanged()) {
-      setMessage("No changes detected. Please modify some fields to update.");
+      setMessage("No changes detected.");
     } else {
-      setMessage(""); // Reset message
+      setMessage("");
       handleUpdate();
     }
   };
 
   if (loading) return <Loading />;
-  console.log("profileData", profileData);
+
   return (
-    <div
-    className="p-2 sm:p-4"
-      // className={`${styles.userProfile} ${
-      //   dark ? "bg-[#69363F]" : "bg-[#232122]"
-      // }`}
-    >
-       <div className="bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] via-[#D4AD66] to-[#D19F43] p-0 shadow-lg mb-6 relative h-48 rounded-t-xl">
-        {/* Rank Display */}
-        {/* <div className="absolute top-4 right-6 font-montserrat text-white text-3xl font-semibold drop-shadow-[2px_2px_4px_rgba(0,0,0,0.5)]">
-          Rank: {profileData.rank || 73}
-        </div> */}
-      
-        {/* Profile Image Container */}
-        <div className="absolute -bottom-20 left-4 sm:left-6 lg:left-10">
-          {/* Camera Icon */}
-          <label
-              htmlFor="profileImage"
-              className="z-40 absolute top-0 left-0 bg-[#3028259b] rounded-full p-3 text-white hover:bg-gray-700 transition cursor-pointer"
+    <div className="max-w-3xl mx-auto space-y-6">
+      {/* Banner + Avatar */}
+      <div
+        className="relative rounded-xl overflow-hidden"
+        style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(109,40,217,0.12) 100%)", border: "1px solid rgba(0,229,255,0.15)", paddingBottom: 60 }}
+      >
+        {/* Banner area */}
+        <div
+          className="h-32 w-full"
+          style={{ background: "linear-gradient(135deg, rgba(0,229,255,0.12) 0%, rgba(109,40,217,0.18) 100%)" }}
+        />
+
+        {/* Avatar */}
+        <div className="absolute bottom-0 left-6 transform translate-y-1/2">
+          <div className="relative">
+            <div
+              className="w-24 h-24 rounded-full overflow-hidden"
+              style={{ border: "3px solid rgba(0,229,255,0.4)", background: "#0A0E27" }}
             >
-               <FaCamera className="relative w-6 h-6 text-white" />
-              <input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "none" }}
+              <img
+                src={
+                  profileImageView
+                    ? profileImageView
+                    : profileData?.profileImage
+                    ? `${apiUrl}/${profileData.profileImage}`
+                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
+                }
+                alt="Profile"
+                className="w-full h-full object-cover"
               />
+            </div>
+            <label
+              htmlFor="profileImage"
+              className="absolute bottom-0 right-0 p-1.5 rounded-full cursor-pointer transition-colors"
+              style={{ background: "rgba(0,229,255,0.15)", border: "1px solid rgba(0,229,255,0.3)" }}
+            >
+              <FaCamera className="w-3 h-3" style={{ color: "#00E5FF" }} />
+              <input type="file" id="profileImage" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
             </label>
-       
-          <div className="relative w-44 h-44 rounded-full bg-[#000000A1] border-[13px] border-[#0000005e] overflow-hidden">
-            <img
-              src={
-                profileImageView
-                  ? profileImageView
-                  : profileData?.profileImage
-                  ? `${apiUrl}/${profileData.profileImage}`
-                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
-              }
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-            
           </div>
-          
-        {/* <div className="flex flex-col gap-4">
-              <label className=" text-[#D4AD66] text-3xl ml-10">{profileData.username}</label>
-              <label className="text-[#D4AD66] text-xl ml-10">{profileData.bio}</label>
-            </div> */}
-      </div>
-      <div className="absolute -bottom-0 left-48 sm:left-52 md:left-56 text-2xl font-[Montserrat]">
-    <label className="text-[#622D37] text-2xl sm:text-3xl font-semibold">{profileData.username}</label>
-  </div>
-  <div className="absolute top-48 left-48 sm:left-52 md:left-[14.2rem]">
-    <label className="font-[500] text-[#FFFFFF] text-lg sm:text-xl">{profileData.bio}</label>
-  </div>
+        </div>
+
+        {/* Username on banner */}
+        <div className="absolute bottom-3 left-36 ml-2">
+          <p
+            className="text-lg font-bold"
+            style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+          >
+            {profileData.username || "Admin"}
+          </p>
+          <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+            {profileData.bio || ""}
+          </p>
+        </div>
       </div>
 
-      <div className={styles.profileForm}>
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 mt-12 sm:mt-14 px-2 sm:px-4">
-          {/* Username */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
-              <FaUser /> Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={profileData?.username || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
-            />
+      {/* Form */}
+      <div
+        className="rounded-xl p-6"
+        style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+      >
+        <h2
+          className="text-lg font-bold mb-5"
+          style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+        >
+          Profile Information
+        </h2>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label style={labelStyle}><FaUser className="w-3 h-3" /> Username</label>
+              <input type="text" name="username" value={profileData.username || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter username" />
+            </div>
+            <div>
+              <label style={labelStyle}><FaUser className="w-3 h-3" /> Full Name</label>
+              <input type="text" name="fullName" value={profileData.fullName || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter full name" />
+            </div>
           </div>
 
-          {/* Full Name */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
-              <FaUser /> Full Name
-            </label>
-            <input
-              type="text"
-              name="fullName"
-              value={profileData?.fullName || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
-            />
-          </div>
-        </div>
-
-        <div className="px-2 sm:px-4 mt-3 sm:mt-4">
-          <label className="text-[#D4AD66] text-sm sm:text-base">
-            <FaEnvelope /> Bio/About
-          </label>
-          <textarea
-            name="bio"
-            value={profileData?.bio || ""}
-            onChange={handleChange}
-            className={`${styles.userProfileInput} p-2 rounded w-full mt-2 text-sm sm:text-base`}
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 px-2 sm:px-4 mt-3 sm:mt-4">
-          {/* Email */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
-              <FaEnvelope /> Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={profileData?.email || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
-            />
+          <div>
+            <label style={labelStyle}><FaEnvelope className="w-3 h-3" /> Bio</label>
+            <textarea name="bio" value={profileData.bio || ""} onChange={handleChange} rows={3} style={fieldStyle} placeholder="Tell us about yourself..." />
           </div>
 
-          {/* Phone Number */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">Phone Number</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={profileData?.phoneNumber || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded flex-1 text-sm sm:text-base`}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label style={labelStyle}><FaEnvelope className="w-3 h-3" /> Email</label>
+              <input type="email" name="email" value={profileData.email || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter email" />
+            </div>
+            <div>
+              <label style={labelStyle}>Phone Number</label>
+              <input type="text" name="phoneNumber" value={profileData.phoneNumber || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter phone number" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label style={labelStyle}><FaCity className="w-3 h-3" /> City</label>
+              <input type="text" name="locationCity" value={profileData.locationCity || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter city" />
+            </div>
+            <div>
+              <label style={labelStyle}><FaCity className="w-3 h-3" /> Country</label>
+              <input type="text" name="locationCountry" value={profileData.locationCountry || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter country" />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Address</label>
+            <input type="text" name="address" value={profileData.address || ""} onChange={handleChange} style={fieldStyle} placeholder="Enter address" />
           </div>
         </div>
 
-        {/* Address Info */}
-
-        <div className="grid grid-cols-1 lg:flex lg:justify-between gap-3 sm:gap-5 px-2 sm:px-4 mt-3 sm:mt-4">
-          {/* City */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
-              <FaCity /> City
-            </label>
-            <input
-              type="text"
-              name="locationCity"
-              value={profileData?.locationCity || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded w-full text-sm sm:text-base`}
-            />
-          </div>
-
-          {/* Country */}
-          <div className="grid grid-cols-1 gap-2 w-full lg:w-90">
-            <label className="text-[#D4AD66] flex items-center gap-2 text-sm sm:text-base">
-              <FaCity /> Country
-            </label>
-            <input
-              type="text"
-              name="locationCountry"
-              value={profileData?.locationCountry || ""}
-              onChange={handleChange}
-              className={`${styles.userProfileInput} p-2 rounded w-full text-sm sm:text-base`}
-            />
-          </div>
-        </div>
-
-        <div className="px-2 sm:px-4 mt-3 sm:mt-4">
-          <label className="text-[#D4AD66] text-sm sm:text-base">Address</label>
-          <input
-            type="text"
-            name="address"
-            value={profileData?.address || ""}
-            onChange={handleChange}
-            className={`${styles.userProfileInput} p-2 rounded w-full mt-2 text-sm sm:text-base`}
-          />
-        </div>
-
-       
-        {/* Show message if no changes are detected */}
-        {message && <div className={`${styles.message} px-2 sm:px-4 text-center mt-4`}>{message}</div>}
-
-        {/* Conditionally render the button */}
-        <div className="flex justify-center items-center w-full px-2 sm:px-4 mt-6">
-        {profile ? (
-          <button
-          className={`font-[Poppins] text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-8 sm:px-12 lg:px-14 py-2 sm:py-3 text-sm sm:text-base ${
-            dark
-              ? "bg-[#302B27] hover:bg-[#49413C]"
-              : "bg-[#302B27] hover:bg-[#A15D66]"
-          }`}
-            onClick={handleProfileUpdateClick} // Handle update button click
+        {message && (
+          <p
+            className="mt-4 text-sm text-center"
+            style={{ color: "#FF7A00", fontFamily: "Inter, sans-serif" }}
           >
-            Update
-          </button>
-        ) : (
-          <button
-             className={`text-[#C9B796] rounded-md font-bold border-[#C9B796] border-[1px] px-8 sm:px-12 lg:px-14 py-2 sm:py-3 font-[Poppins] text-sm sm:text-base ${
-                dark
-                  ? "bg-[#302B27] hover:bg-[#49413C]"
-                  : "bg-[#302B27] hover:bg-[#A15D66]"
-              }`}
-            onClick={handleCreate} // Create the profile if it doesn't exist
-          >
-            Create Profile
-          </button>
+            {message}
+          </p>
         )}
+
+        <div className="flex justify-center mt-6">
+          {profile ? (
+            <button onClick={handleProfileUpdateClick} className="btn-primary px-10 py-2.5">
+              Update Profile
+            </button>
+          ) : (
+            <button onClick={handleCreate} className="btn-primary px-10 py-2.5">
+              Create Profile
+            </button>
+          )}
         </div>
       </div>
     </div>

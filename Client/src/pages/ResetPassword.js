@@ -1,141 +1,183 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.png";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { resetPassword } from "../redux/features/authSlice";
 import Loading from "../utils/Loading/Loading";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import toast from "react-hot-toast";
+import logo from "../assets/xephra logo-01.png";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const { token } = useParams();
   const dispatch = useDispatch();
   const { message, error, loading } = useSelector((state) => state.auth);
-
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Check if passwords match
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
+      toast.error("Passwords do not match!");
       return;
     }
     dispatch(resetPassword({ token, newPassword }));
-
-    if (message) {
-      navigate("/dashboard");
-    }
+    if (message) navigate("/dashboard");
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  if (loading) return <Loading />;
+
   return (
-    <section className="bg-[#69363f] dark:bg-[#69363f] h-screen">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto  lg:py-0">
-        <Link
-          to={'/'}
-          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+    <div
+      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1340 50%, #0A0E27 100%)" }}
+    >
+      <div
+        className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%)" }}
+      />
+
+      <div className="w-full max-w-sm relative z-10 animate-fade-in">
+        <div className="flex justify-center mb-8">
+          <Link to="/">
+            <img src={logo} alt="Xephra" className="h-10 w-auto" />
+          </Link>
+        </div>
+
+        <div
+          className="rounded-lg p-8"
+          style={{
+            background: "rgba(15, 23, 42, 0.95)",
+            border: "1px solid rgba(0, 229, 255, 0.15)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+          }}
         >
-          <img className="w-20 h-16 mr-2" src={logo} alt="logo" />
-        </Link>
-        <div className="w-full p-6 bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
-          <h1 className="mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            Reset Your Password
-          </h1>
-          <p className="font-light text-gray-500 dark:text-gray-400">
-            Enter your new password to reset your password.
-          </p>
-          <form
-            className="mt-2 space-y-4 lg:mt-3 md:space-y-5"
-            onSubmit={handleSubmit}
-          >
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                New password
-              </label>
+          <div className="mb-6">
+            <h2
+              className="text-2xl font-bold mb-2"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
+              Reset Password
+            </h2>
+            <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+              Enter your new password below.
+            </p>
+          </div>
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <div className="relative">
+              <label htmlFor="newPassword" className="form-label">New Password</label>
               <input
-                type="password"
-                name="newPassword"
+                type={showNew ? "text" : "password"}
                 id="newPassword"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="New password"
+                className="input-field pr-11"
                 required
-                placeholder="password"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-9"
+                style={{ color: "#9CA3AF" }}
+                onClick={() => setShowNew(!showNew)}
+                tabIndex={-1}
+              >
+                {showNew ? <AiFillEyeInvisible size={18} /> : <AiFillEye size={18} />}
+              </button>
             </div>
 
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Confirm new password
-              </label>
+            <div className="relative">
+              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
               <input
-                type="password"
-                name="confirmPassword"
-                placeholder="password"
+                type={showConfirm ? "text" : "password"}
                 id="confirmPassword"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                className="input-field pr-11"
                 required
               />
+              <button
+                type="button"
+                className="absolute right-3 top-9"
+                style={{ color: "#9CA3AF" }}
+                onClick={() => setShowConfirm(!showConfirm)}
+                tabIndex={-1}
+              >
+                {showConfirm ? <AiFillEyeInvisible size={18} /> : <AiFillEye size={18} />}
+              </button>
             </div>
 
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="terms"
-                  aria-describedby="terms"
-                  type="checkbox"
-                  className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                  checked={acceptTerms}
-                  onChange={() => setAcceptTerms(!acceptTerms)}
-                  required
-                />
+            <div className="flex items-start gap-3">
+              <div
+                className="w-5 h-5 mt-0.5 rounded cursor-pointer flex-shrink-0 flex items-center justify-center transition-all duration-150"
+                style={{
+                  background: acceptTerms ? "#00E5FF" : "rgba(75,85,99,0.15)",
+                  border: acceptTerms ? "none" : "2px solid #4B5563",
+                }}
+                onClick={() => setAcceptTerms(!acceptTerms)}
+              >
+                {acceptTerms && (
+                  <svg className="w-3 h-3" fill="none" stroke="#0A0E27" strokeWidth={3} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
               </div>
-              <div className="ml-3 text-sm">
-                <label
-                  htmlFor="terms"
-                  className="font-light text-gray-500 dark:text-gray-300"
-                >
-                  I accept the{" "}
-                  <a
-                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                    href="#"
-                  >
-                    Terms and Conditions
-                  </a>
-                </label>
-              </div>
+              <label
+                className="text-sm cursor-pointer"
+                style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+                onClick={() => setAcceptTerms(!acceptTerms)}
+              >
+                I accept the{" "}
+                <span style={{ color: "#00E5FF" }}>Terms and Conditions</span>
+              </label>
             </div>
 
-            <button
-              type="submit"
-              className="w-full text-white bg-[#843e4b] hover:bg-[#69363f] focus:ring-1 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-[#843e4b] dark:hover:bg-[#843e4b] dark:focus:ring-[#843e4b]"
-            >
+            {error && (
+              <p className="text-sm" style={{ color: "#EF4444", fontFamily: "Inter, sans-serif" }}>
+                {typeof error === "string" ? error : "Something went wrong."}
+              </p>
+            )}
+            {message && (
+              <div
+                className="p-3 rounded-lg text-sm"
+                style={{
+                  background: "rgba(16, 185, 129, 0.08)",
+                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                  color: "#10B981",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                {message}
+              </div>
+            )}
+
+            <button type="submit" className="btn-primary w-full text-base">
               Reset Password
             </button>
           </form>
-          {error && <p className="text-red-400">{error}</p>}
-          {message && <p className="text-green-400">{message}</p>}
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/login"
+              className="text-sm flex items-center justify-center gap-1.5 transition-colors duration-150"
+              style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Login
+            </Link>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

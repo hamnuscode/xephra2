@@ -5,46 +5,47 @@ import { useSelector, useDispatch } from "react-redux";
 import { getEvents, getEventsByUserId } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 import { getTopRanking } from "../../redux/features/rankingSlice";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { checkUserProfile } from "../../redux/features/userSlice";
 
-const DashboardUser = ({ dark }) => {
-  const dispatch = useDispatch();
-  const { loading, events, event, participants } = useSelector(
-    (state) => state.events
-  );
-  const { profileExists } = useSelector((state) => state.user);
+const sliderSettings = (count) => ({
+  dots: false,
+  infinite: count >= 3,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  autoplay: count >= 3,
+  autoplaySpeed: 3000,
+  responsive: [
+    { breakpoint: 1200, settings: { slidesToShow: Math.min(2, count), slidesToScroll: 1 } },
+    { breakpoint: 450, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+  ],
+});
 
+const DashboardUser = ({ setActiveMenu }) => {
+  const dispatch = useDispatch();
+  const { loading, events, event, participants } = useSelector((state) => state.events);
+  const { profileExists } = useSelector((state) => state.user);
   const { topranks } = useSelector((state) => state.ranking);
 
   const userId = JSON.parse(localStorage.getItem("user"))?.UserId;
 
   useEffect(() => {
     dispatch(getEvents());
-    if (userId) {
-      dispatch(getEventsByUserId(userId));
-    }
+    if (userId) dispatch(getEventsByUserId(userId));
   }, [dispatch, event]);
 
   useEffect(() => {
-    if (userId) {
-      dispatch(checkUserProfile(userId));
-    }
+    if (userId) dispatch(checkUserProfile(userId));
   }, [dispatch, userId]);
 
   useEffect(() => {
     if (profileExists === false) {
-      toast.warn(
-        "Your profile is not set up yet. Please complete your profile.",
-        {
-          position: "top-right",
-          className:
-            "bg-yellow-500 text-white font-medium p-4 rounded-lg shadow-lg",
-          progressClassName: "bg-yellow-300",
-          autoClose: false,
-        }
-      );
+      toast.warn("Your profile is not set up yet. Please complete your profile.", {
+        position: "top-right",
+        autoClose: false,
+      });
     }
   }, [profileExists]);
 
@@ -52,268 +53,214 @@ const DashboardUser = ({ dark }) => {
     dispatch(getTopRanking());
   }, []);
 
-  const sortedUpcomingEvents = [...events].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  const sortedRegisteredEvents = [...participants].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  const settings1 = {
-    dots: false,
-    infinite: sortedRegisteredEvents.length >= 3, // Jab 3 ya zyada events hon to infinite true hoga
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: sortedRegisteredEvents.length >= 3, // Jab 3 ya zyada events hon to autoplay on hoga
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: Math.min(2, sortedRegisteredEvents.length), // Jab 2 events ho to max 2 dikhayega
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 450,
-        settings: {
-          slidesToShow: 1, // Mobile screens pe ek ek slide dikhayega
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
-  const settings2 = {
-    dots: false,
-    infinite: sortedRegisteredEvents.length >= 3, // Jab 3 ya zyada events hon to infinite true hoga
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: sortedRegisteredEvents.length >= 3, // Jab 3 ya zyada events hon to autoplay on hoga
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: Math.min(2, sortedRegisteredEvents.length), // Jab 2 events ho to max 2 dikhayega
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 450,
-        settings: {
-          slidesToShow: 1, // Mobile screens pe ek ek slide dikhayega
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
-  const maxWightedScore = Math.max(
-    ...topranks.map((user) => user.weightedScore)
-  );
+  const sortedUpcomingEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedRegisteredEvents = [...participants].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const maxWeightedScore = Math.max(...topranks.map((u) => u.weightedScore), 1);
 
   return (
-    <div className="container mx-auto p-1 ">
-      {/* Hero Section */}
-      <div className="relative bg-cover bg-center h-64">
-        <div className=" w-full absolute inset-0  bg-opacity-50 text-left text-white lg:mt-1">
-          <h1
-            className="bg-gradient-to-r from-[#D19f43] via-[#B2945C] via-[#C9B796] via-[#B39867] to-[#D4AD66] text-transparent bg-clip-text sm:w-full font-bold drop-shadow-[2px_2px_4px_rgba(0,0,0,0.7)]
-          font-montserrat font-bold text-[30px] text-center md:text-start md:text-[45px] sm:leading-[50.9px] sm:tracking-[-5%]
-          "
-          >
-            Welcome to the<br></br> Gaming <br />
-            Dashboard
-          </h1>
-          <h2
-            className={`bg-clip-text text-transparent mt-2  md:text-wrap sm:text-xl drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] font-montserrat font-bold text-[10px] text-center sm:text-start sm:text-[15px] leading-[34.9px] ${
-              dark ? "bg-[#D4AD66]" : "text-white"
-            }`}
-          >
-            Stay updated with upcoming events and your ranking progress.
-          </h2>
-        </div>
+    <div className="space-y-6">
+      {/* Hero */}
+      <div
+        className="rounded-xl p-8"
+        style={{
+          background: "linear-gradient(135deg, rgba(0,229,255,0.06) 0%, rgba(109,40,217,0.06) 100%)",
+          border: "1px solid rgba(0,229,255,0.12)",
+        }}
+      >
+        <h1
+          className="text-3xl font-bold mb-2"
+          style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+        >
+          Welcome to the Gaming Dashboard
+        </h1>
+        <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+          Stay updated with upcoming events and your ranking progress.
+        </p>
       </div>
 
-      {/* Main Section */}
+      {/* Events + Rankings */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Events Section */}
-        <div className={`col-span-12 lg:col-span-9 }`}>
+        {/* Events */}
+        <div className="col-span-12 lg:col-span-9 space-y-6">
+          {/* Upcoming Events */}
           <div
-            className={`p-4 rounded shadow-2xl shadow-gray-950 pb-10 backdrop-blur-sm ${
-              dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#2321225d]"
-            }`}
+            className="rounded-xl p-6"
+            style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
           >
             <h2
-              className={`font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] lg:text-3xl md:text-xl sm:text-lg font-bold mb-4 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent text-center`}
+              className="text-lg font-bold mb-4"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
             >
               Upcoming Events
             </h2>
-            <Slider {...settings1}>
-              {sortedUpcomingEvents.length === 0 ? (
-                <p className="text-red-500 text-xl lg:text-2xl">
-                  No Registered Events!{" "}
-                </p>
-              ) : (
-                sortedUpcomingEvents?.map((event) => (
-                  <Link
-                    to={`/eventuser/${event?._id}`}
-                    key={event._id}
-                    className="flex-none p-1 flex flex-col h-full  min-h-[200px]"
-                  >
-                    <div className="relative rounded-lg shadow-lg overflow-hidden h-full min-h-[200px]  hover:scale-105 transition duration-200">
-                      {/* Image as background */}
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <Loading />
+              </div>
+            ) : sortedUpcomingEvents.length === 0 ? (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No upcoming events.</p>
+            ) : (
+              <Slider {...sliderSettings(sortedUpcomingEvents.length)}>
+                {sortedUpcomingEvents.map((event) => (
+                  <Link to={`/eventuser/${event._id}`} key={event._id} className="block p-1">
+                    <div
+                      className="relative rounded-lg overflow-hidden transition-transform duration-200"
+                      style={{ height: 200 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    >
                       <img
                         src={`${process.env.REACT_APP_BACKEND}/${event.image}`}
                         alt={event.title}
-                        className="h-48 w-full object-cover"
+                        className="w-full h-full object-cover"
                       />
-
-                      {/* Title overlay */}
-                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t  from-black/100 to-[#00000020] p-3">
-                        <h3 className="text-white text-lg font-bold drop-shadow-2xl [text-shadow:_2px_2px_4px_rgba(0,0,0,0.8)]">
-                          {event?.title}
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        {event.date && (
+                          <p
+                            className="text-xs mb-1"
+                            style={{ color: "#00E5FF", fontFamily: "IBM Plex Mono, monospace" }}
+                          >
+                            {new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </p>
+                        )}
+                        <h3
+                          className="text-sm font-semibold"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
+                          {event.title}
                         </h3>
                       </div>
                     </div>
                   </Link>
-                ))
-              )}
-            </Slider>
+                ))}
+              </Slider>
+            )}
           </div>
 
+          {/* Registered Events */}
           <div
-            className={`p-4 rounded shadow-2xl shadow-gray-950 pb-10 mt-5 backdrop-blur-sm ${
-              dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#2321225d]"
-            }`}
+            className="rounded-xl p-6"
+            style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
           >
             <h2
-              className={` font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent text-center lg:text-3xl md:text-xl sm:text-lg font-bold mb-8 mt-2`}
+              className="text-lg font-bold mb-4"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
             >
               Registered Events
             </h2>
-            <Slider {...settings2}>
-              {sortedRegisteredEvents.length === 0 ? (
-                <p className="text-red-500 text-center text-lg lg:text-xl">
-                  No Registered Events!{" "}
-                </p>
-              ) : (
-                sortedRegisteredEvents.map((event) => (
+            {sortedRegisteredEvents.length === 0 ? (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No registered events yet.</p>
+            ) : (
+              <Slider {...sliderSettings(sortedRegisteredEvents.length)}>
+                {sortedRegisteredEvents.map((event) => (
                   <Link
                     to={`/eventuser/${event?.eventId?._id}`}
                     key={event?.eventId?._id}
-                    className="flex-none p-1 flex flex-col h-full  min-h-[200px]"
+                    className="block p-1"
                   >
                     <div
-                      key={event?.eventId?.id}
-                      className="relative rounded-lg shadow flex flex-col h-full min-h-[200px]  hover:scale-105 transition duration-200"
+                      className="relative rounded-lg overflow-hidden transition-transform duration-200"
+                      style={{ height: 200 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                     >
-                      {/* Image as background */}
                       <img
                         src={`${process.env.REACT_APP_BACKEND}/${event?.eventId?.image}`}
-                        alt={event.title}
-                        className="h-48 w-full object-cover rounded"
+                        alt={event?.eventId?.title}
+                        className="w-full h-full object-cover"
                       />
-
-                      {/* Title overlay */}
-                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t  from-black/100 to-[#00000020] p-3">
-                        <h3 className="text-white text-lg font-bold drop-shadow-2xl [text-shadow:_2px_2px_4px_rgba(0,0,0,0.8)]">
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3
+                          className="text-sm font-semibold"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
                           {event?.eventId?.title}
                         </h3>
                       </div>
                     </div>
                   </Link>
-                ))
-              )}
-            </Slider>
+                ))}
+              </Slider>
+            )}
           </div>
         </div>
-        {/* Rankings Section */}
+
+        {/* Rankings */}
         <div
-          className={`col-span-12 lg:col-span-3 p-4 rounded shadow text-white ${
-            dark ? "bg-[#292622c4] " : "bg-[#292622c4]"
-          }`}
+          className="col-span-12 lg:col-span-3 rounded-xl p-5 flex flex-col"
+          style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
         >
           <h2
-            className={`font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] lg:text-2xl md:text-xl sm:text-lg font-bold mb-4 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent`}
+            className="text-lg font-bold mb-4"
+            style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
           >
             User Rankings
           </h2>
-          <ul>
-            {topranks && topranks.length > 0
-              ? topranks.map((user, index) => {
-                  const progress =
-                    (user?.weightedScore / maxWightedScore) * 100;
-                  return (
-                    <li key={user.id} className="flex items-center mb-4">
-                      {/* Ensure the image does not shrink */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={`${process.env.REACT_APP_BACKEND}/${user?.userProfile?.profileImage}`}
-                          alt={user.name}
-                          className="w-12 h-12 rounded-full object-cover"
+          <ul className="flex-1 space-y-4">
+            {topranks.length > 0 ? (
+              topranks.map((user, index) => {
+                const progress = (user.weightedScore / maxWeightedScore) * 100;
+                return (
+                  <li key={user.id} className="flex items-center gap-3">
+                    <img
+                      src={`${process.env.REACT_APP_BACKEND}/${user?.userProfile?.profileImage}`}
+                      alt={user.name}
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      style={{ border: "1px solid rgba(0,229,255,0.2)" }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p
+                          className="text-xs font-semibold truncate"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
+                          {user?.userProfile?.fullName}
+                        </p>
+                        <span
+                          className="text-xs flex-shrink-0 ml-1"
+                          style={{ color: "#00E5FF", fontFamily: "IBM Plex Mono, monospace" }}
+                        >
+                          #{index + 1}
+                        </span>
+                      </div>
+                      <div
+                        className="w-full h-1.5 rounded-full overflow-hidden"
+                        style={{ background: "rgba(75,85,99,0.3)" }}
+                      >
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${progress}%`,
+                            background: "linear-gradient(90deg, #00E5FF, #6D28D9)",
+                          }}
                         />
                       </div>
-
-                      {/* Content Section */}
-                      <div className="flex-1 min-w-0 ml-4">
-                        {/* Name and Rank in One Line */}
-                        <div className="flex items-center justify-between text-xs whitespace-nowrap overflow-hidden">
-                          {/* Allow Name to Shrink but Not Rank */}
-                          <p
-                            className={`font-bold truncate flex-1 ${
-                              dark ? "text-[#C9B796]" : "text-[#C9B796]"
-                            }`}
-                          >
-                            {user?.userProfile?.fullName}
-                          </p>
-
-                          {/* Ensure Rank is Fully Visible at the End */}
-                          <p
-                            className={`ml-2 flex-shrink-0 ${
-                              dark
-                                ? "bg-gradient-to-r text-[#C9B796]"
-                                : "text-[#C9B796]"
-                            }`}
-                          >
-                            Rank {index + 1}
-                          </p>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="flex items-center space-x-2 mt-1">
-                          <div className="w-full bg-[#69363F] h-2 rounded">
-                            <div
-                              className={`h-2 rounded ${
-                                dark ? "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] " : "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] "
-                              }`}
-                              style={{ width: `${progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })
-              : "Currently we don't have top 5 players"}
+                    </div>
+                  </li>
+                );
+              })
+            ) : (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 13 }}>
+                No rankings yet.
+              </p>
+            )}
           </ul>
           <Link
             to="/userdashboard/allranking"
-            className={`text-white font-semibold py-2 px-4 rounded mt-4 block text-center ${
-              dark
-                ? "bg-[#854951] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-white hover:text-black"
-                : "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#854951]"
-            }`}
+            className="btn-primary mt-4 block text-center py-2 text-sm"
           >
             See All
           </Link>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

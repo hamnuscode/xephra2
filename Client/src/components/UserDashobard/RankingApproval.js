@@ -9,9 +9,33 @@ import {
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../utils/Loading/Loading";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-const RankingApproval = ({ dark }) => {
+const selectStyle = {
+  background: "rgba(10,14,39,0.8)",
+  border: "1px solid rgba(75,85,99,0.3)",
+  color: "#F8F9FA",
+  borderRadius: 6,
+  padding: "8px 10px",
+  width: "100%",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 13,
+  outline: "none",
+};
+
+const cellInputStyle = {
+  background: "rgba(10,14,39,0.8)",
+  border: "1px solid rgba(75,85,99,0.3)",
+  color: "#F8F9FA",
+  borderRadius: 6,
+  padding: "6px 10px",
+  width: "100%",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 13,
+  outline: "none",
+};
+
+const RankingApproval = () => {
   const dispatch = useDispatch();
   const { loading, hostedEvents } = useSelector((state) => state.events);
   const { data, error, submissions } = useSelector((state) => state.ranking);
@@ -20,11 +44,8 @@ const RankingApproval = ({ dark }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user.UserId;
 
-  // Check subscription status when component mounts
   useEffect(() => {
-    if (userId) {
-      dispatch(getSubscriptionStatus(userId));
-    }
+    if (userId) dispatch(getSubscriptionStatus(userId));
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -32,13 +53,11 @@ const RankingApproval = ({ dark }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (userId) {
-      dispatch(fetchUserSubmissions(userId));
-    }
+    if (userId) dispatch(fetchUserSubmissions(userId));
   }, [dispatch, userId, data]);
 
   const [game, setGame] = useState({
-    userId: userId,
+    userId,
     eventId: "",
     gameName: "",
     rank: "",
@@ -47,349 +66,241 @@ const RankingApproval = ({ dark }) => {
     screenshot: null,
   });
 
-  const handleInputChange = (field, value) => {
-    setGame((prevGame) => ({
-      ...prevGame,
-      [field]: value,
-    }));
-  };
+  const handleInputChange = (field, value) => setGame((p) => ({ ...p, [field]: value }));
+  const handleScreenshotUpload = (file) => setGame((p) => ({ ...p, screenshot: file }));
 
-  // Handle file upload
-  const handleScreenshotUpload = (file) => {
-    setGame((prevGame) => ({
-      ...prevGame,
-      screenshot: file,
-    }));
-  };
-
-  // Handle submission
   const handleSubmit = () => {
-    // Check subscription before allowing submission
     if (!subscriptionStatus?.isActive) {
       toast.error("You need an active subscription to submit game entries.");
       return;
     }
-
-    setGame((prevGame) => ({
-      ...prevGame,
-      status: "Pending",
-    }));
-
+    setGame((p) => ({ ...p, status: "Pending" }));
     dispatch(postRankingApproval(game));
-    setGame({
-      userId: userId,
-      eventId: "",
-      gameName: "",
-      rank: "",
-      score: "",
-      status: "-",
-      screenshot: null,
-    });
+    setGame({ userId, eventId: "", gameName: "", rank: "", score: "", status: "-", screenshot: null });
   };
 
-  const handleDelete = (userId, eventId) => {
-    dispatch(deleteUserSubmission({ userId, eventId }));
-  };
+  const handleDelete = (userId, eventId) => dispatch(deleteUserSubmission({ userId, eventId }));
 
-  if (loading || subscriptionStatus?.loading) {
-    return <Loading />;
-  }
+  if (loading || subscriptionStatus?.loading) return <Loading />;
 
-  // Show subscription restriction message if not subscribed
   if (!subscriptionStatus?.isActive) {
     return (
-      <div className={`rounded-lg p-6 mx-auto text-center min-h-full shadow-2xl shadow-gray-950 backdrop-blur-sm ${
-          dark
-            ? "bg-[#492f3418] bg-opacity-[.06]":"bg-[#492f3418] bg-opacity-[.06]"}`}>
-        <h1
-          className={`text-[2.5rem] sm:text-2xl md:text-[2.5rem] lg:text-5xl font-semibold mb-6 font-[Montserrat] drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent ${
-            dark ? "" : "text-[#232122]"
-          }`}
-        >
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
           User Game Entry
         </h1>
-        
-        <div className={`${
-                    dark ? "bg-[#0000007D]" : "bg-[#69363F66]"
-                  } rounded-lg p-8 z-50 backdrop-blur-lg mx-auto max-w-md`}>
-          <div className="text-center">
-            <div className="mb-6">
-              <svg 
-                className="mx-auto h-16 w-16 text-[#D19F43] mb-4" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
-                />
-              </svg>
-            </div>
-            
-            <h3 className="text-2xl font-bold text-[#D19F43] mb-4">
-              Subscription Required
-            </h3>
-            
-            <p className="text-[#C9B796] mb-6 text-lg leading-relaxed">
-              You need an active subscription to submit game entries and participate in tournaments.
-            </p>
-            
-            <div className="space-y-4">
-              <p className="text-[#C9B796] text-sm">
-                Unlock access to:
-              </p>
-              <ul className="text-[#C9B796] text-sm space-y-2 mb-6">
-                <li>• Submit game rankings</li>
-                <li>• Join tournaments</li>
-                <li>• View detailed statistics</li>
-                <li>• Access premium features</li>
-              </ul>
-              
-              <Link to="/paymentportal">
-                <button className="w-full px-8 py-3 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black font-semibold rounded-md hover:opacity-90 transition duration-300 transform hover:scale-105">
-                  Activate Subscription
-                </button>
-              </Link>
-            </div>
+        <div
+          className="rounded-xl p-8 text-center max-w-md mx-auto"
+          style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+        >
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ background: "rgba(0,229,255,0.08)", border: "1px solid rgba(0,229,255,0.2)" }}
+          >
+            <svg className="w-8 h-8" fill="none" stroke="#00E5FF" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
+          <h3 className="text-xl font-bold mb-3" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
+            Subscription Required
+          </h3>
+          <p className="mb-6 text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+            You need an active subscription to submit game entries and participate in tournaments.
+          </p>
+          <ul className="text-sm mb-6 space-y-1 text-left" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+            {["Submit game rankings", "Join tournaments", "View detailed statistics", "Access premium features"].map((f) => (
+              <li key={f} className="flex items-center gap-2">
+                <span style={{ color: "#00E5FF" }}>·</span> {f}
+              </li>
+            ))}
+          </ul>
+          <Link to="/paymentportal" className="btn-primary block py-2.5 text-sm">
+            Activate Subscription
+          </Link>
         </div>
       </div>
     );
   }
 
+  const thStyle = {
+    padding: "10px 12px",
+    textAlign: "left",
+    fontSize: 11,
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    color: "#6B7280",
+    fontFamily: "IBM Plex Mono, monospace",
+    borderBottom: "1px solid rgba(75,85,99,0.2)",
+    whiteSpace: "nowrap",
+  };
+
+  const tdStyle = {
+    padding: "10px 12px",
+    verticalAlign: "top",
+    borderBottom: "1px solid rgba(75,85,99,0.1)",
+  };
+
   return (
-    <div className={`rounded-lg p-6 mx-auto text-center min-h-full shadow-2xl shadow-gray-950 backdrop-blur-sm  ${
-        dark
-          ? "bg-[#492f3418] bg-opacity-[.06]":"bg-[#492f3418] bg-opacity-[.06]"}`}>
-      <h1
-        className={`text-[2.5rem] sm:text-2xl md:text-[2.5rem] lg:text-5xl font-semibold mb-6 font-[Montserrat] drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent ${
-          dark ? "" : "text-[#232122]"
-        }`}
-      >
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
         User Game Entry
       </h1>
-      <div className={` ${
-                  dark ? "bg-[#0000007D]" : "bg-[#69363F66]"
-                } rounded-lg p-5 z-50 backdrop-blur-lg`}
-                >
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+
+      {/* Entry Form Table */}
+      <div
+        className="rounded-xl p-5 overflow-x-auto"
+        style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+      >
+        <h2 className="text-base font-semibold mb-4" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
+          Submit New Entry
+        </h2>
+        <table className="w-full min-w-[700px]">
           <thead>
             <tr>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Game Name
-              </th>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Rank
-              </th>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Score
-              </th>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Screenshot
-              </th>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Status
-              </th>
-              <th
-                className={`text-[#C9B796] py-3 px-4 border border-[#C9B796] ${
-                  dark ? "bg-[#69363F]" : "bg-[#232122]"
-                }`}
-              >
-                Actions
-              </th>
+              {["Game Name", "Rank", "Score", "Screenshot", "Status", "Action"].map((h) => (
+                <th key={h} style={thStyle}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            <tr
-              key={game.id}
-              className="bg-[#C9B796] hover:bg-[#b1a185] transition"
-            >
-              <td className="py-3 px-4 border border-[#69363F]">
+            <tr>
+              <td style={tdStyle}>
                 <select
-                  id="hostedEvents"
                   onChange={(e) => {
-                    const selectedEvent = hostedEvents.find(
-                      (event) => event._id === e.target.value
-                    );
-                    if (selectedEvent) {
-                      setGame((prevGame) => ({
-                        ...prevGame,
-                        eventId: selectedEvent._id,
-                        gameName: selectedEvent.title,
-                      }));
-                    }
+                    const ev = hostedEvents.find((x) => x._id === e.target.value);
+                    if (ev) setGame((p) => ({ ...p, eventId: ev._id, gameName: ev.title }));
                   }}
                   value={game.eventId}
-                  defaultValue=""
-                  className="py-2 px-4 bg-[#303030] text-[#C9B796]"
+                  style={selectStyle}
                 >
-                  <option value="" disabled>
-                    Select an event
-                  </option>
-                  {hostedEvents &&
-                    hostedEvents.map((event) => (
-                      <option key={event._id} value={event._id}>
-                        {event.title}
-                      </option>
-                    ))}
+                  <option value="" disabled style={{ background: "#0A0E27" }}>Select event</option>
+                  {hostedEvents.map((ev) => (
+                    <option key={ev._id} value={ev._id} style={{ background: "#0A0E27" }}>{ev.title}</option>
+                  ))}
                 </select>
               </td>
-              <td className="py-3 px-4 border border-[#69363F]">
+              <td style={tdStyle}>
                 <input
                   type="number"
                   value={game.rank}
                   onChange={(e) => handleInputChange("rank", e.target.value)}
-                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030] text-white"
-                  placeholder="Enter rank"
+                  style={cellInputStyle}
+                  placeholder="Rank"
                   disabled={game.status !== "-"}
                 />
               </td>
-              <td className="py-3 px-4 border border-[#69363F]">
+              <td style={tdStyle}>
                 <input
                   type="number"
                   value={game.score}
                   onChange={(e) => handleInputChange("score", e.target.value)}
-                  className="w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030] text-white"
-                  placeholder="Enter score"
+                  style={cellInputStyle}
+                  placeholder="Score"
                   disabled={game.status !== "-"}
                 />
               </td>
-              <td className="py-3 px-4 border border-[#69363F]">
+              <td style={tdStyle}>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleScreenshotUpload(e.target.files[0])}
-                  className="text-[#C9B796] w-full border border-[#69363F] rounded px-2 py-1 placeholder-[#C9B796] bg-[#303030]"
                   disabled={game.status !== "-"}
+                  style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 12 }}
                 />
                 {game.screenshot && (
                   <img
                     src={URL.createObjectURL(game.screenshot)}
-                    alt="Screenshot Preview"
-                    className="mt-2 w-20 h-20 object-cover border border-[#69363F] rounded"
+                    alt="Preview"
+                    className="mt-2 w-16 h-16 object-cover rounded"
+                    style={{ border: "1px solid rgba(75,85,99,0.3)" }}
                   />
                 )}
               </td>
-              <td className="py-3 px-4 border border-[#69363F] text-center">
+              <td style={tdStyle}>
                 <span
-                  className={`${
-                    game.status === "Pending"
-                      ? "text-yellow-600"
-                      : "text-gray-500"
-                  } font-bold`}
+                  className="text-xs font-semibold"
+                  style={{
+                    color: game.status === "Pending" ? "#FF7A00" : "#6B7280",
+                    fontFamily: "IBM Plex Mono, monospace",
+                  }}
                 >
                   {game.status}
                 </span>
               </td>
-              <td className="py-3 px-4 border-b border-r border-[#69363F] text-center flex justify-center gap-2 items-center">
+              <td style={tdStyle}>
                 {game.status === "-" ? (
                   <button
                     onClick={handleSubmit}
-                    className="bg-[#5C2D33] text-white px-4 py-2 rounded-md hover:bg-[#854951] hover:text-black hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] transition"
+                    className="btn-primary px-4 py-1.5 text-xs"
                   >
                     Submit
                   </button>
                 ) : (
-                  <span className="text-green-600 font-bold">Submitted</span>
+                  <span className="text-xs font-semibold" style={{ color: "#10B981" }}>Submitted</span>
                 )}
-                {error && <p className="text-red-300">{error?.message}</p>}
+                {error && <p className="text-xs mt-1" style={{ color: "#EF4444" }}>{error?.message}</p>}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div className="mt-4 ">
-        {submissions.length === 0 && !loading && <p className="text-[#C9B796]">No submissions found.</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+      {/* Submissions */}
+      {submissions.length === 0 && !loading ? (
+        <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No submissions found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {submissions.map((submission) => (
             <div
               key={submission._id}
-              className="bg-white shadow-md rounded-2xl border border-gray-200 hover:shadow-xl transition duration-300 ease-in-out overflow-hidden"
+              className="rounded-xl overflow-hidden"
+              style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
             >
-              {/* Screenshot on Top */}
               {submission.screenshot && (
                 <img
                   src={`${process.env.REACT_APP_BACKEND}/${submission.screenshot}`}
-                  alt="Submission Screenshot"
-                  className="w-full h-36 object-cover rounded-t-2xl"
+                  alt="Screenshot"
+                  className="w-full h-36 object-cover"
                 />
               )}
-
-              {/* Details Section */}
-              <div className="p-4 space-y-3">
-                <h3 className="text-sm font-semibold text-gray-800 mb-2">
+              <div className="p-4">
+                <h3 className="text-sm font-semibold mb-3" style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}>
                   {submission.gameName}
                 </h3>
-
-                <div className="grid grid-cols-2 gap-2 text-gray-600 text-xs">
-                  <p>
-                    <span className="font-medium text-gray-700">Rank:</span>{" "}
-                    {submission.rank}
-                  </p>
-                  <p>
-                    <span className="font-medium text-gray-700">Score:</span>{" "}
-                    {submission.score}
-                  </p>
+                <div className="grid grid-cols-2 gap-2 text-xs mb-3" style={{ color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" }}>
+                  <p>Rank: <span style={{ color: "#F8F9FA" }}>{submission.rank}</span></p>
+                  <p>Score: <span style={{ color: "#F8F9FA" }}>{submission.score}</span></p>
                 </div>
-
-                <div className="mt-2 flex flex-row justify-around items-center">
-                  <div className="flex flex-row items-center">
-                    <p className="font-medium text-gray-700 text-xs">Status:</p>
-                    <span
-                      className={`px-2 ms-2 py-1 inline-block rounded-full text-xs font-semibold ${
-                        submission.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : submission.status === "Approved"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {submission.status}
-                    </span>
-                  </div>
-
-                  <div>
-                    <button
-                    className="bg-red-500 px-3 py-1 rounded text-white"
-                      onClick={() =>
-                        handleDelete(submission.userId, submission.eventId)
-                      }
-                    >
-                      Delete
-                    </button>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span
+                    className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                    style={
+                      submission.status === "Approved"
+                        ? { background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", color: "#10B981" }
+                        : submission.status === "Pending"
+                        ? { background: "rgba(255,122,0,0.1)", border: "1px solid rgba(255,122,0,0.3)", color: "#FF7A00" }
+                        : { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444" }
+                    }
+                  >
+                    {submission.status}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(submission.userId, submission.eventId)}
+                    className="text-xs px-3 py-1 rounded-md transition-colors"
+                    style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.15)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-      </div>
+      )}
     </div>
   );
 };

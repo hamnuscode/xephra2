@@ -1,107 +1,160 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.png";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { forgotPassword } from "../redux/features/authSlice";
 import Loading from "../utils/Loading/Loading";
+import { Link } from "react-router-dom";
+import logo from "../assets/xephra logo-01.png";
+
 const ForgetPassword = () => {
   const dispatch = useDispatch();
   const { message, error, loading } = useSelector((state) => state.auth);
-
   const [email, setEmail] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(forgotPassword({ email }));
-  
-    setEmail(" ");
-    setAcceptTerms(" ");
+    setEmail("");
+    setAcceptTerms(false);
   };
-  if (loading) {
-    return <Loading />;
-  }
+
+  if (loading) return <Loading />;
+
   return (
-    <section className="bg-[#69363f] dark:bg-[#69363f] h-screen">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a
-          href="#"
-          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+    <div
+      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1340 50%, #0A0E27 100%)" }}
+    >
+      <div
+        className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(109,40,217,0.08) 0%, transparent 70%)" }}
+      />
+
+      <div className="w-full max-w-sm relative z-10 animate-fade-in">
+        <div className="flex justify-center mb-8">
+          <Link to="/">
+            <img src={logo} alt="Xephra" className="h-10 w-auto" />
+          </Link>
+        </div>
+
+        <div
+          className="rounded-lg p-8"
+          style={{
+            background: "rgba(15, 23, 42, 0.95)",
+            border: "1px solid rgba(0, 229, 255, 0.15)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+          }}
         >
-          <img className="w-20 h-16 mr-2" src={logo} alt="logo" />
-        </a>
-        <div className="w-full p-6 bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md dark:bg-gray-800 dark:border-gray-700 sm:p-8">
-          <h1 className="mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            Forgot your password?
-          </h1>
-          <p className="font-light text-gray-500 dark:text-gray-400">
-            Don't Worry! Just type in your email, and we will send an email to
-            you, and then you will reset your password.
-          </p>
-          <form
-            className="mt-4 space-y-4 lg:mt-5 md:space-y-5"
-            onSubmit={handleSubmit}
-          >
+          <div className="mb-6">
+            <h2
+              className="text-2xl font-bold mb-2"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
+              Forgot Password?
+            </h2>
+            <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+              Enter your email and we'll send you reset instructions.
+            </p>
+          </div>
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Your email
-              </label>
+              <label htmlFor="email" className="form-label">Email Address</label>
               <input
                 type="email"
-                name="email"
                 id="email"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="name@company.com"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="input-field"
                 required
               />
             </div>
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
+
+            <div className="flex items-start gap-3">
+              <div className="relative mt-0.5">
                 <input
                   id="terms"
-                  aria-describedby="terms"
                   type="checkbox"
-                  className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
                   checked={acceptTerms}
                   onChange={() => setAcceptTerms(!acceptTerms)}
                   required
+                  className="sr-only"
                 />
-              </div>
-              <div className="ml-3 text-sm">
-                <label
-                  htmlFor="terms"
-                  className="font-light text-gray-500 dark:text-gray-300"
+                <div
+                  onClick={() => setAcceptTerms(!acceptTerms)}
+                  className="w-5 h-5 rounded cursor-pointer flex items-center justify-center transition-all duration-150"
+                  style={{
+                    background: acceptTerms ? "#00E5FF" : "rgba(75,85,99,0.15)",
+                    border: acceptTerms ? "none" : "2px solid #4B5563",
+                  }}
                 >
-                  I accept the{" "}
-                  <a
-                    className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                    href="#"
-                  >
-                    Terms and Conditions
-                  </a>
-                </label>
+                  {acceptTerms && (
+                    <svg className="w-3 h-3" fill="none" stroke="#0A0E27" strokeWidth={3} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
               </div>
+              <label
+                htmlFor="terms"
+                className="text-sm cursor-pointer"
+                style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+                onClick={() => setAcceptTerms(!acceptTerms)}
+              >
+                I accept the{" "}
+                <span className="transition-colors" style={{ color: "#00E5FF" }}>
+                  Terms and Conditions
+                </span>
+              </label>
             </div>
-            {error && (<p className="text-red-400">{error}</p>)}
-            {message && (<p className="text-green-400">{message}</p>)}
-            <button
-              type="submit"
-              className="w-full text-white bg-[#843e4b] hover:bg-[#69363f] focus:ring-1 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-[#843e4b] dark:hover:bg-[#843e4b] dark:focus:ring-[#843e4b]"
-            >
-              Send instructions
+
+            {error && (
+              <p className="text-sm" style={{ color: "#EF4444", fontFamily: "Inter, sans-serif" }}>
+                {typeof error === "string" ? error : "Something went wrong."}
+              </p>
+            )}
+            {message && (
+              <div
+                className="p-3 rounded-lg text-sm"
+                style={{
+                  background: "rgba(16, 185, 129, 0.08)",
+                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                  color: "#10B981",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                {message}
+              </div>
+            )}
+
+            <button type="submit" className="btn-primary w-full text-base">
+              Send Reset Instructions
             </button>
-            <ToastContainer />
           </form>
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/login"
+              className="text-sm flex items-center justify-center gap-1.5 transition-colors duration-150"
+              style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Login
+            </Link>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

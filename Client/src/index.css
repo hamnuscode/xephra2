@@ -2,5 +2,365 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+/* ─── Font Imports ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
+/* ─── Design Tokens ────────────────────────────────────────── */
+:root {
+  --color-deep-ink: #0A0E27;
+  --color-black: #000000;
+  --color-cyan: #00E5FF;
+  --color-purple: #6D28D9;
+  --color-orange: #FF7A00;
+  --color-green: #10B981;
+  --color-amber: #F59E0B;
+  --color-red: #EF4444;
+  --color-blue: #3B82F6;
+  --color-off-white: #F8F9FA;
+  --color-light-gray: #E5E7EB;
+  --color-medium-gray: #9CA3AF;
+  --color-dark-gray: #4B5563;
+
+  --font-headline: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-cyan: 0 4px 12px rgba(0, 229, 255, 0.25);
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-standard: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Global Reset ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-deep-ink);
+  color: var(--color-off-white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── Focus Styles ─────────────────────────────────────────── */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
+
+button, a, input, textarea, select {
+  outline: none;
+}
+
+/* ─── Typography ───────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  color: var(--color-off-white);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: 3.052rem; }
+h2 { font-size: 2.441rem; }
+h3 { font-size: 1.953rem; }
+h4 { font-size: 1.563rem; font-weight: 600; }
+h5 { font-size: 1.25rem; font-weight: 600; }
+
+p { font-size: 1rem; font-weight: 400; }
+
+/* ─── Component Utilities ──────────────────────────────────── */
+@layer components {
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply bg-brand-cyan text-deep-ink font-semibold px-7 py-3 rounded-lg
+           shadow-cyan transition-all duration-150
+           hover:scale-[1.02] hover:shadow-cyan-lg
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    font-family: var(--font-body);
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border-2 border-brand-purple text-brand-purple font-semibold
+           px-6 py-[10px] rounded-lg transition-all duration-150
+           hover:bg-brand-purple/20 active:scale-[0.98] disabled:opacity-50;
+    font-family: var(--font-body);
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-brand-cyan font-medium px-4 py-2 rounded-lg
+           transition-all duration-150 hover:bg-brand-cyan/10
+           active:scale-[0.98] disabled:opacity-50;
+    font-family: var(--font-body);
+  }
+
+  .btn-danger {
+    @apply bg-brand-red/90 text-white font-semibold px-6 py-3 rounded-lg
+           transition-all duration-150 hover:bg-brand-red
+           hover:scale-[1.02] active:scale-[0.98];
+    font-family: var(--font-body);
+  }
+
+  /* ── Inputs ── */
+  .input-field {
+    @apply w-full bg-dark-gray/15 border border-dark-gray/30 rounded-md
+           px-4 py-3 text-off-white text-base placeholder:text-medium-gray
+           transition-all duration-150;
+    font-family: var(--font-body);
+    font-size: 16px;
+  }
+  .input-field:focus {
+    border-color: var(--color-cyan);
+    border-width: 2px;
+    background-color: rgba(75, 85, 99, 0.25);
+    box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+  }
+  .input-field.error {
+    border-color: var(--color-red);
+    background-color: rgba(239, 68, 68, 0.05);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .form-label {
+    @apply block text-sm font-semibold text-off-white mb-2;
+    font-family: var(--font-body);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    @apply rounded-lg p-6 shadow-card transition-all duration-200;
+  }
+  .card:hover {
+    border-color: rgba(0, 229, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .card-interactive {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    @apply rounded-lg p-6 shadow-card transition-all duration-200 cursor-pointer;
+  }
+  .card-interactive:hover {
+    border-color: rgba(0, 229, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    transform: scale(1.02);
+  }
+
+  .card-glass {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply rounded-lg p-6 shadow-md;
+  }
+
+  .card-section {
+    background: var(--color-deep-ink);
+    border-top: 2px solid var(--color-cyan);
+    @apply p-8 mb-6;
+  }
+
+  /* ── Badges ── */
+  .badge-achievement {
+    background: linear-gradient(135deg, #00E5FF, #6D28D9);
+    @apply text-off-white text-xs font-semibold px-3.5 py-1.5 rounded-full;
+    font-family: var(--font-body);
+    box-shadow: 0 2px 8px rgba(0, 229, 255, 0.2);
+  }
+
+  .badge-status-active {
+    @apply inline-flex items-center gap-1.5 text-xs text-brand-green;
+    font-family: var(--font-mono);
+  }
+  .badge-status-active::before {
+    content: '';
+    @apply w-2 h-2 rounded-full bg-brand-green inline-block;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+
+  .badge-status-inactive {
+    @apply inline-flex items-center gap-1.5 text-xs text-medium-gray;
+    font-family: var(--font-mono);
+  }
+  .badge-status-inactive::before {
+    content: '';
+    @apply w-2 h-2 rounded-full bg-medium-gray inline-block;
+  }
+
+  .badge-rank {
+    @apply text-brand-cyan text-sm font-semibold;
+    font-family: var(--font-mono);
+    letter-spacing: 0.025em;
+  }
+
+  /* ── Tables ── */
+  .table-header {
+    background: rgba(0, 229, 255, 0.1);
+    border-bottom: 2px solid var(--color-cyan);
+    @apply text-off-white font-semibold text-sm uppercase tracking-widest py-4 px-4;
+    font-family: var(--font-body);
+  }
+
+  .table-row {
+    border-bottom: 1px solid rgba(75, 85, 99, 0.2);
+    @apply text-off-white py-4 px-4 transition-colors duration-150;
+    font-family: var(--font-body);
+  }
+  .table-row:hover {
+    background: rgba(0, 229, 255, 0.05);
+  }
+
+  .table-row-active {
+    background: rgba(0, 229, 255, 0.1);
+    border-left: 3px solid var(--color-cyan);
+    @apply text-off-white py-4 px-4;
+  }
+
+  .data-cell {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    @apply text-right text-off-white;
+    letter-spacing: 0.025em;
+  }
+
+  /* ── Navigation ── */
+  .nav-item {
+    @apply text-medium-gray font-medium px-4 h-16 flex items-center
+           border-b-[3px] border-transparent transition-all duration-150 cursor-pointer;
+    font-family: var(--font-body);
+    font-size: 16px;
+  }
+  .nav-item:hover {
+    color: var(--color-cyan);
+    border-bottom-color: var(--color-cyan);
+  }
+  .nav-item.active {
+    color: var(--color-cyan);
+    border-bottom-color: var(--color-cyan);
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-5 py-3 text-sm font-medium text-medium-gray
+           border-l-[3px] border-transparent cursor-pointer transition-all duration-150;
+    font-family: var(--font-body);
+  }
+  .sidebar-item:hover {
+    color: var(--color-cyan);
+    background: rgba(0, 229, 255, 0.05);
+  }
+  .sidebar-item.active {
+    color: var(--color-cyan);
+    border-left-color: var(--color-cyan);
+    background: rgba(0, 229, 255, 0.08);
+  }
+
+  /* ── Page Sections ── */
+  .page-bg {
+    background-color: var(--color-deep-ink);
+    @apply min-h-screen;
+  }
+
+  .section-title {
+    font-family: var(--font-headline);
+    @apply text-3xl font-bold text-off-white;
+    letter-spacing: -0.02em;
+  }
+
+  .section-subtitle {
+    font-family: var(--font-body);
+    @apply text-medium-gray text-base;
+  }
+
+  /* ── Stat numbers ── */
+  .stat-number {
+    font-family: var(--font-mono);
+    @apply text-off-white font-semibold;
+    letter-spacing: 0.025em;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    @apply border-t border-dark-gray/20 my-6;
+  }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .modal-container {
+    background: var(--color-deep-ink);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    @apply rounded-lg p-8 shadow-xl max-w-lg w-full mx-4 animate-fade-in;
+  }
+
+  /* ── Notification/Toast ── */
+  .toast-base {
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    @apply rounded-lg px-4 py-3 text-off-white shadow-lg;
+    font-family: var(--font-body);
+  }
+}
+
+/* ─── Shimmer animation ────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(0,229,255,0.05) 25%, rgba(0,229,255,0.12) 50%, rgba(0,229,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  @apply rounded;
+}
+
+/* ─── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.35); border-radius: 10px; }
+::-webkit-scrollbar-track { background: rgba(10,14,39,0.8); border-radius: 10px; }
+* { scrollbar-width: thin; scrollbar-color: rgba(0,229,255,0.35) rgba(10,14,39,0.8); }
+
+/* ─── React-Hot-Toast override ─────────────────────────────── */
+.go2072408551 {
+  background: rgba(15, 23, 42, 0.98) !important;
+  color: #F8F9FA !important;
+  border: 1px solid rgba(0, 229, 255, 0.25) !important;
+  border-radius: 8px !important;
+}

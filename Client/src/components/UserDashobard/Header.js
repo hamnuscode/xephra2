@@ -1,226 +1,102 @@
-// import React from "react";
-// import { Link } from "react-router-dom";
-// import { BsFillMenuButtonWideFill } from "react-icons/bs";
-// import { IoMoonSharp } from "react-icons/io5";
-// import { ImBrightnessContrast } from "react-icons/im";
-// import { FiBell } from "react-icons/fi"; // For Notifications Icon
-// import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useEffect } from "react";
-
-// export default function Header({
-//   dark,
-//   toggleSideMenu,
-//   toggleTheme,
-//   profileImage,
-//   onMenuClick,
-//   profile,
-// }) {
-
-//   const dispatch = useDispatch();
-
-//   // Access subscriptionStatus from Redux
-//   const { subscriptionStatus } = useSelector((state) => state.payment);
-
-//   // Fetch subscription status when component mounts
-//   useEffect(() => {
-//     const userId = profile?.userId || localStorage.getItem("userId");
-//     if (userId) {
-//       dispatch(getSubscriptionStatus(userId));
-//     }
-//   }, [dispatch, profile?.userId]);
-
-//   return (
-//     <header className={`z-10 py-4`}>
-//       <div className="container flex items-center justify-between h-full px-6 mx-auto text-white dark:text-white">
-//         {/* Menu Button */}
-//         <button
-//           className="p-1 mr-5 -ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-white"
-//           onClick={toggleSideMenu}
-//           aria-label="Menu"
-//         >
-//           <BsFillMenuButtonWideFill />
-//         </button>
-
-//         {/* Right-side Buttons */}
-//         <div className="flex items-center space-x-4 ml-auto">
-//           {/* <Link to="/paymentform">
-//       <button
-//         className="px-4 py-2 text-white bg-[#854951] hover:bg-[#994b55] rounded-full focus:outline-none"
-//         aria-label="Subscribe"
-//       >
-//         Subscribe
-//       </button>
-//       </Link> */}
-
-//          {/* Subscription Status Badge */}
-//           {profile?.userId && (
-//             subscriptionStatus?.isActive ? (
-//               <div className="px-4 py-2 bg-[#854951] text-white rounded-full text-sm">
-//                 Subscription Active
-//               </div>
-//             ) : (
-//               <div className="px-4 py-2 bg-red-600 text-white rounded-full text-sm">
-//                 Subscription Not Active
-//               </div>
-//             )
-//           )}
-
-//           {/* Dark Mode Toggle */}
-//           <button
-//             onClick={toggleTheme}
-//             className="p-1 text-white rounded-full focus:outline-none hover:bg-gray-400 dark:text-gray-300 dark:hover:bg-gray-700"
-//             aria-label="Toggle Dark Mode"
-//           >
-//             {dark ? (
-//               <ImBrightnessContrast className="text-[#C9B796]" />
-//             ) : (
-//               <IoMoonSharp className="text-[#C9B796]" />
-//             )}
-//           </button>
-
-//           {/* Notifications Icon */}
-//           <button
-//             className="p-1 text-white rounded-full focus:outline-none hover:bg-gray-400 dark:text-gray-300 dark:hover:bg-gray-700"
-//             aria-label="Notifications"
-//           >
-//             <FiBell className="text-[#C9B796]" />
-//           </button>
-
-//           {/* Profile Image */}
-//           <Link>
-//             <div
-//               className="flex flex-row justify-center items-center"
-//               onClick={() => onMenuClick("userProfile")}
-//             >
-//               <p className="me-2">
-//                 {profile?.username ? profile?.username : "username"}
-//               </p>
-//               <img
-//                 src={
-//                   profile?.profileImage
-//                     ? `${process.env.REACT_APP_BACKEND}/${profile?.profileImage}`
-//                     : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
-//                 }
-//                 alt="Profile"
-//                 className="w-8 h-8 rounded-full border-2 border-gray-300 dark:border-gray-600 object-cover"
-//               />
-//             </div>
-//           </Link>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
-
-
-
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
-import { IoMoonSharp } from "react-icons/io5";
-import { ImBrightnessContrast } from "react-icons/im";
 import { getSubscriptionStatus } from "../../redux/features/paymentSlice";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationBell from "../Notifications/NotificationBell";
 
-export default function Header({
-  dark,
-  toggleSideMenu,
-  toggleTheme,
-  profileImage,
-  onMenuClick,
-  profile,
-}) {
+export default function Header({ toggleSideMenu, onMenuClick, profile }) {
   const dispatch = useDispatch();
   const { subscriptionStatus } = useSelector((state) => state.payment);
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
-  // Debug auth state
-  console.log('User Header - Auth state:', { 
-    user: !!user, 
-    userId: user?._id, 
-    isAuthenticated,
-    profileId: profile?.userId || profile?._id 
-  });
-
-  // Use user._id, or profile.userId, or fallback
   const userId = user?._id || profile?.userId || profile?._id;
 
   useEffect(() => {
-    const userId = profile?.userId || localStorage.getItem("userId");
-    if (userId) {
-      dispatch(getSubscriptionStatus(userId));
-    }
+    const id = profile?.userId || localStorage.getItem("userId");
+    if (id) dispatch(getSubscriptionStatus(id));
   }, [dispatch, profile?.userId]);
 
   return (
-    <header className="z-10 py-3 bg-transparent">
-      <div className="container mx-auto flex flex-wrap items-center justify-between px-4 sm:px-6 lg:px-8 text-white">
-        {/* Left - Menu Icon */}
+    <header className="z-10 py-3 px-6">
+      <div className="flex items-center justify-between h-full">
+        {/* Mobile menu button */}
         <button
-          className="p-2 rounded-md md:hidden focus:outline-none"
+          className="p-2 rounded-lg md:hidden transition-colors"
           onClick={toggleSideMenu}
           aria-label="Menu"
+          style={{ color: "#9CA3AF" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
         >
-          <BsFillMenuButtonWideFill size={20} />
+          <BsFillMenuButtonWideFill className="w-5 h-5" />
         </button>
 
-        {/* Right - Actions and Profile */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 ml-auto">
-          {/* Subscription Badge */}
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Right actions */}
+        <div className="flex items-center gap-3">
+          {/* Subscription badge */}
           {profile?.userId && (
             <div
-              className={`text-sm px-3 py-1 rounded-full ${
-                subscriptionStatus?.isActive ? "bg-[#854951]" : "bg-gray-500"
-              } text-white whitespace-nowrap`}
+              className="hidden sm:flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+              style={
+                subscriptionStatus?.isActive
+                  ? {
+                      background: "rgba(16,185,129,0.12)",
+                      border: "1px solid rgba(16,185,129,0.35)",
+                      color: "#10B981",
+                      fontFamily: "IBM Plex Mono, monospace",
+                    }
+                  : {
+                      background: "rgba(239,68,68,0.1)",
+                      border: "1px solid rgba(239,68,68,0.3)",
+                      color: "#EF4444",
+                      fontFamily: "IBM Plex Mono, monospace",
+                    }
+              }
             >
-              {subscriptionStatus?.isActive
-                ? "Subscription Active"
-                : "No Subscription"}
+              {subscriptionStatus?.isActive ? "Active" : "No Plan"}
             </div>
           )}
 
-          {/* Toggle Theme Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full focus:outline-none hover:bg-gray-300 dark:hover:bg-gray-700"
-            aria-label="Toggle Theme"
-          >
-            {dark ? (
-              <ImBrightnessContrast className="text-[#C9B796]" />
-            ) : (
-              <IoMoonSharp className="text-[#C9B796]" />
-            )}
-          </button>
-
           {/* Notification Bell */}
-          <NotificationBell 
-            userId={userId}
-            userType="user"
-            isAdmin={false}
-          />
+          <NotificationBell userId={userId} userType="user" isAdmin={false} />
 
           {/* Profile */}
-          <Link>
-            <div
-              className="flex items-center gap-2 max-w-[150px] truncate"
-              onClick={() => onMenuClick("userProfile")}
+          <button
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-150"
+            onClick={() => onMenuClick("userProfile")}
+            style={{
+              background: "rgba(0,229,255,0.06)",
+              border: "1px solid rgba(0,229,255,0.15)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(0,229,255,0.12)";
+              e.currentTarget.style.borderColor = "rgba(0,229,255,0.3)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(0,229,255,0.06)";
+              e.currentTarget.style.borderColor = "rgba(0,229,255,0.15)";
+            }}
+          >
+            <img
+              src={
+                profile?.profileImage
+                  ? `${process.env.REACT_APP_BACKEND || "http://localhost:5000"}/${profile.profileImage}`
+                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
+              }
+              alt="Profile"
+              className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+              style={{ border: "1px solid rgba(0,229,255,0.3)" }}
+            />
+            <span
+              className="text-sm font-medium hidden sm:block"
+              style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
             >
-              <p className="truncate text-sm">
-                {profile?.username || "username"}
-              </p>
-              <img
-                src={
-                  profile?.profileImage
-                    ? `${process.env.REACT_APP_BACKEND}/${profile?.profileImage}`
-                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
-                }
-                alt="Profile"
-                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 object-cover"
-              />
-            </div>
-          </Link>
+              {profile?.username || "User"}
+            </span>
+          </button>
         </div>
       </div>
     </header>

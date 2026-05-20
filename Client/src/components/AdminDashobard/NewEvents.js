@@ -3,7 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { createEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 
-const NewEvents = ({ setActiveMenu, dark }) => {
+const inputClass = "input-field w-full";
+
+const NewEvents = ({ setActiveMenu }) => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.events);
   const [formData, setFormData] = useState({
@@ -19,205 +21,185 @@ const NewEvents = ({ setActiveMenu, dark }) => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setFormData({
-      ...formData,
-      image: file,
-    });
+    setFormData({ ...formData, image: e.target.files[0] });
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append("title", formData.title);
-    formDataToSubmit.append("game", formData.game);
-    formDataToSubmit.append("gameMode", formData.gameMode);
-    formDataToSubmit.append("date", formData.date);
-    formDataToSubmit.append("time", formData.time);
-    formDataToSubmit.append("description", formData.description);
-    formDataToSubmit.append("prizePool", formData.prizePool);
-    formDataToSubmit.append("rules", formData.rules);
-    formDataToSubmit.append("image", formData.image);
-
-    // Get adminId from localStorage
-    const adminData = JSON.parse(localStorage.getItem("user"));
-    const adminId = adminData?.UserId;
-    
-    // Append adminId to FormData
-    if (adminId) {
-        formDataToSubmit.append("adminId", adminId);
-    }
-
-    dispatch(createEvent(formDataToSubmit));
-    setFormData({
-      title: "",
-      game: "",
-      gameMode: "",
-      date: "",
-      time: "",
-      description: "",
-      image: null,
-      prizePool: "",
-      rules: "",
-    });
+    const fd = new FormData();
+    Object.entries(formData).forEach(([k, v]) => { if (v !== null) fd.append(k, v); });
+    const adminId = JSON.parse(localStorage.getItem("user"))?.UserId;
+    if (adminId) fd.append("adminId", adminId);
+    dispatch(createEvent(fd));
+    setFormData({ title: "", game: "", gameMode: "", date: "", time: "", description: "", image: null, prizePool: "", rules: "" });
   };
-  if (loading) {
-    return <Loading />;
-  }
+
+  if (loading) return <Loading />;
 
   return (
-    <div
-      className={`mx-auto py-10 px-4 rounded-lg shadow-2xl shadow-gray-950 drop-shadow-[3px_3px_10px_rgba(0,0,0,0.6)] backdrop-blur-sm ${
-        dark
-          ? "bg-[#492f3418] bg-opacity-[.06]":"bg-[#232122]"}`}
-    >
-      <h2 className="text-[48px] font-bold text-[#b6a99a] mb-6 text-center drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#e5b967] via-[#d1a759] to-[#f9f9f9] bg-clip-text text-transparent">
+    <div className="max-w-3xl mx-auto">
+      <h2
+        className="text-2xl font-bold mb-6"
+        style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+      >
         Create New Tournament
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2 ">
-              Tournament Title
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
+
+      <div
+        className="rounded-xl p-6"
+        style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+      >
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="form-label">Tournament Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Enter tournament title"
+                required
+              />
+            </div>
+            <div>
+              <label className="form-label">Game</label>
+              <input
+                type="text"
+                name="game"
+                value={formData.game}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="e.g. PUBG, Free Fire"
+                required
+              />
+            </div>
+            <div>
+              <label className="form-label">Game Mode</label>
+              <select
+                name="gameMode"
+                value={formData.gameMode}
+                onChange={handleChange}
+                className={inputClass}
+                required
+                style={{ background: "rgba(15,23,42,0.9)", color: "#F8F9FA", border: "1px solid rgba(75,85,99,0.3)", borderRadius: 8, padding: "10px 12px" }}
+              >
+                <option value="" style={{ background: "#0A0E27" }}>Select Game Mode</option>
+                <option value="solo" style={{ background: "#0A0E27" }}>Solo</option>
+                <option value="duo" style={{ background: "#0A0E27" }}>Duo</option>
+                <option value="squad" style={{ background: "#0A0E27" }}>Squad</option>
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Prize Pool</label>
+              <input
+                type="text"
+                name="prizePool"
+                value={formData.prizePool}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="e.g. 50000"
+                required
+              />
+            </div>
+            <div>
+              <label className="form-label">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className={inputClass}
+                required
+              />
+            </div>
+            <div>
+              <label className="form-label">Time</label>
+              <input
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                className={inputClass}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="form-label">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
               onChange={handleChange}
-              className="bg-[#00000082] text-white p-2 rounded-md"
+              className={inputClass}
+              rows={4}
+              placeholder="Describe the tournament..."
               required
             />
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Game</label>
-            <input
-              type="text"
-              name="game"
-              value={formData.game}
+          <div>
+            <label className="form-label">Rules</label>
+            <textarea
+              name="rules"
+              value={formData.rules}
               onChange={handleChange}
-              className="p-2 rounded-md bg-[#00000082] text-white"
+              className={inputClass}
+              rows={3}
+              placeholder="Enter tournament rules..."
               required
             />
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Game Mode</label>
-            <select
-              name="gameMode"
-              value={formData.gameMode}
-              onChange={handleChange}
-              className="p-2 rounded-md bg-[#00000082] text-white"
-              style={{
-                backgroundColor: '#00000082',
-                color: 'white'
-              }}
-              required
+          <div>
+            <label className="form-label">Tournament Banner</label>
+            <div
+              className="relative rounded-lg overflow-hidden"
+              style={{ border: "1px dashed rgba(0,229,255,0.25)", background: "rgba(0,229,255,0.03)", padding: "12px 16px" }}
             >
-              <option value="" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Select Game Mode</option>
-              <option value="solo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Solo</option>
-              <option value="duo" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Duo</option>
-              <option value="squad" style={{ backgroundColor: '#232122', color: '#D4AD66' }}>Squad</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Date</label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="p-2 rounded-md bg-[#00000082] text-white"
-              required
-            />
+              <input
+                type="file"
+                name="image"
+                onChange={handleImageChange}
+                accept="image/*"
+                required
+                style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 13 }}
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Time</label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              className="p-2 rounded-md bg-[#00000082] text-white"
-              required
-            />
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <label className="text-[#D4AD66] ml-1 pb-2">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="p-2 rounded-md bg-[#00000082] text-white"
-            rows="4"
-            required
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-[#D4AD66] ml-1 pb-2">Rules</label>
-          <textarea
-            name="rules"
-            value={formData.rules}
-            onChange={handleChange}
-            className="p-2 rounded-md bg-[#00000082] text-white"
-            rows="2"
-            required
-          />
-        </div>
+          {error && (
+            <p className="text-sm" style={{ color: "#EF4444", fontFamily: "Inter, sans-serif" }}>
+              {error?.error || error}
+            </p>
+          )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Prize Pool</label>
-            <input
-              type="text"
-              name="prizePool"
-              value={formData.prizePool}
-              onChange={handleChange}
-              className="p-2 rounded-md bg-[#00000082] text-white"
-              required
-            />
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setActiveMenu("postedEvents")}
+              className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              style={{
+                background: "rgba(75,85,99,0.15)",
+                border: "1px solid rgba(75,85,99,0.25)",
+                color: "#9CA3AF",
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary flex-1 py-2.5 text-sm">
+              Create Tournament
+            </button>
           </div>
-
-          <div className="flex flex-col">
-            <label className="text-[#D4AD66] ml-1 pb-2">Image Upload</label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleImageChange}
-              className="p-[5px] rounded-md bg-[#00000082] text-white"
-              required
-            />
-          </div>
-        </div>
-        <div className="flex justify-center mt-4">
-          <button
-            type="submit"
-            className={`text-[#C9B796] px-10 py-3 rounded-md transition ${
-              dark
-                ? "bg-[#302B27] border-[1px] border-[#C9B796] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:text-black"
-                : "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] border-[1px] border-[#C9B796] text-black hover:bg-[#A15D66]"
-            } `}
-          >
-            Create Event
-          </button>
-        </div>
-        {error && <p className="text-red-500">{error?.error}</p>}
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

@@ -8,47 +8,36 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import { getTopRanking } from "../../redux/features/rankingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../utils/Loading/Loading";
 import { Link } from "react-router-dom";
 
-// Register the required Chart.js components
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-const RankingBoard = ({ dark }) => {
+const RankingBoard = () => {
   const dispatch = useDispatch();
-  const { topranks, loading, error } = useSelector((state) => state.ranking);
-
-  const users = [
-    { name: "Player1", rank: 1, score: 920, progress: 85 },
-    { name: "Player2", rank: 2, score: 870, progress: 75 },
-    { name: "Player3", rank: 3, score: 810, progress: 70 },
-    { name: "Player4", rank: 4, score: 750, progress: 65 },
-    { name: "Player5", rank: 5, score: 700, progress: 60 },
-  ];
+  const { topranks, loading } = useSelector((state) => state.ranking);
 
   useEffect(() => {
     dispatch(getTopRanking());
   }, [dispatch]);
 
+  if (loading) return <Loading />;
+
+  const maxWeightedScore = Math.max(...topranks.map((u) => u.weightedScore), 1);
+
   const barChartData = {
-    labels: topranks.map((user) => user?.userProfile?.fullName),
+    labels: topranks.map((u) => u?.userProfile?.fullName || "—"),
     datasets: [
       {
-        label: "Scores",
-        data: topranks.map((user) => user?.weightedScore),
-        backgroundColor: "#854951",
+        label: "Score",
+        data: topranks.map((u) => u.weightedScore),
+        backgroundColor: "rgba(0,229,255,0.5)",
+        borderColor: "#00E5FF",
         borderWidth: 1,
+        borderRadius: 6,
       },
     ],
   };
@@ -56,110 +45,112 @@ const RankingBoard = ({ dark }) => {
   const barChartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        display: false,
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(10,14,39,0.95)",
+        borderColor: "rgba(0,229,255,0.2)",
+        borderWidth: 1,
+        titleColor: "#00E5FF",
+        bodyColor: "#9CA3AF",
       },
     },
     scales: {
       x: {
-        ticks: {
-          color: "#622D37", // Change X-axis label color
-        },
+        ticks: { color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" },
+        grid: { color: "rgba(75,85,99,0.15)" },
       },
       y: {
-        ticks: {
-          color: "#622D37", // Change Y-axis label color
-        },
+        ticks: { color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" },
+        grid: { color: "rgba(75,85,99,0.15)" },
       },
     },
   };
 
-  const doughnutData = (progress) => ({
-    datasets: [
-      {
-        data: [progress, 100 - progress],
-        backgroundColor: ["#854951", "#e5e7eb"],
-        borderWidth: 0,
-      },
-    ],
-  });
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  const maxWightedScore = Math.max(
-    ...topranks.map((user) => user.weightedScore)
-  );
-
   return (
-    <div
-      className={`min-h-screen p-8 shadow-2xl shadow-gray-950 rounded-xl backdrop-blur-sm bg-[#492f3418] bg-opacity-[.03] ${
-        dark ? "" : ""
-      }`}
-    >
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
+    <div className="space-y-6">
+      <h1
+        className="text-2xl font-bold"
+        style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+      >
         Ranking Board
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Players Section */}
-        <div className="bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] to-[#D4AD66] shadow-md rounded-lg p-6">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-center text-[#622D37]" style={{ textShadow: "4px 4px 8px rgba(0, 0, 0, 0.5)" }}>
-            Top Players
-          </h2>
-          <div className="flex justify-end">
-            <Link to="/userdashboard/allranking">See All</Link>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Players */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
+              Top Players
+            </h2>
+            <Link
+              to="/userdashboard/allranking"
+              className="text-sm font-medium"
+              style={{ color: "#00E5FF", fontFamily: "Inter, sans-serif" }}
+            >
+              See All →
+            </Link>
           </div>
-          <div>
-            {topranks && topranks.length > 0
-              ? topranks.map((user, index) => {
-                  const progress =
-                    (user?.weightedScore / maxWightedScore) * 100;
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between py-4"
-                    >
-                      <div className="flex w-full items-center space-x-4">
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center">
-                          <span className="text-base lg:text-2xl font-bold text-[#622D37]" style={{ textShadow: "4px 4px 8px rgba(0, 0, 0, 0.5)" }}>
-                            #{index + 1}
-                          </span>
-                        </div>
-                        <div className="flex flex-col w-full">
-                          <div className="flex items-center justify-between w-full">
-                            <h3 className="text-sm lg:text-lg font-medium" style={{ textShadow: "4px 4px 8px rgba(0, 0, 0, 0.5)" }}>
-                              {user?.userProfile?.fullName}
-                            </h3>
-                            <div>
-                              <p className="text-xs lg:text-lg text-black">
-                                Score: {user?.weightedScore}
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                            <div
-                              className="bg-[#622D37] h-2 rounded-full transition-all duration-300 text-center text-xs font-bold text-white"
-                              style={{ width: `${progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
+          {topranks.length === 0 ? (
+            <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No ranking data available.</p>
+          ) : (
+            <ul className="space-y-4">
+              {topranks.map((user, index) => {
+                const progress = (user.weightedScore / maxWeightedScore) * 100;
+                return (
+                  <li key={index} className="flex items-center gap-3">
+                    <span
+                      className="w-8 text-center font-bold text-sm flex-shrink-0"
+                      style={{ color: "#00E5FF", fontFamily: "IBM Plex Mono, monospace" }}
+                    >
+                      #{index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p
+                          className="text-sm font-semibold truncate"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
+                          {user?.userProfile?.fullName || "Unknown"}
+                        </p>
+                        <span
+                          className="text-xs flex-shrink-0 ml-2"
+                          style={{ color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" }}
+                        >
+                          {user.weightedScore}
+                        </span>
+                      </div>
+                      <div
+                        className="w-full h-1.5 rounded-full overflow-hidden"
+                        style={{ background: "rgba(75,85,99,0.3)" }}
+                      >
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${progress}%`, background: "linear-gradient(90deg, #00E5FF, #6D28D9)" }}
+                        />
                       </div>
                     </div>
-                  );
-                })
-              : "Currently we don't have top 5 players"}
-          </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
-        {/* Scores Overview Section */}
-        <div className="bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] to-[#D4AD66] shadow-md rounded-lg p-6">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-center text-[#622D37]" style={{ textShadow: "4px 4px 8px rgba(0, 0, 0, 0.5)" }}>
+        {/* Scores Chart */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+        >
+          <h2 className="text-lg font-bold mb-5" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
             Scores Overview
           </h2>
-          <Bar data={barChartData} options={barChartOptions} />
+          <div style={{ height: 260 }}>
+            <Bar data={barChartData} options={barChartOptions} />
+          </div>
         </div>
       </div>
     </div>

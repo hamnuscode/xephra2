@@ -10,9 +10,9 @@
     bottom: 0;
     width: 10px;
     height: 50%;
-    background: #69363f;
+    background: #00E5FF;
     transform-origin: center bottom;
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
   }
   
   .loader__bar:nth-child(1) {
@@ -56,8 +56,9 @@
     left: 0;
     width: 10px;
     height: 10px;
-    background: #b8a792;
+    background: #6D28D9;
     border-radius: 50%;
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.6);
     -webkit-animation: ball624 4s infinite;
     animation: ball624 4s infinite;
   }

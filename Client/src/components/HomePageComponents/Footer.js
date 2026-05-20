@@ -348,231 +348,221 @@ Address:Al Ghurair Giga Westria road, Plaza No #34 2nd Floor, DHA phase 2, Islam
   Phone Number: +92-300-0692222, +92 339 0018363`
   };
 
-  const openPolicy = (policyType) => {
-    setActivePolicy(policyType);
-  };
+  const openPolicy = (policyType) => setActivePolicy(policyType);
+  const closePolicy = () => setActivePolicy(null);
 
-  const closePolicy = () => {
-    setActivePolicy(null);
-  };
+  const footerLink = { color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: "14px", cursor: "pointer", background: "none", border: "none", padding: 0, textAlign: "left" };
+  const footerLinkHover = (e, enter) => { e.currentTarget.style.color = enter ? "#00E5FF" : "#9CA3AF"; };
+
   return (
-    <footer className="bg-gradient-to-br from-black via-gray-900 to-purple-900/20 text-white relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-500/20 to-purple-600/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-32 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-2xl"></div>
-      </div>
+    <footer style={{ background: "rgba(5, 7, 20, 0.95)", borderTop: "1px solid rgba(75, 85, 99, 0.2)" }}>
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          
-          {/* Brand Section */}
-          <div className="lg:col-span-1">
-            <div className="mb-6">
-              <img 
-                src={logo}
-                alt="XEPHRA Logo" 
-                className="h-12 w-40 mb-3" 
-              />
-              <p className="text-gray-300 mt-2 text-sm leading-relaxed">
-                The ultimate gaming arena where champions are born. Join the competition and prove your skills in the most exciting tournaments.
-              </p>
-            </div>
-
-
-            {/* Social Media */}
-             <div className="flex space-x-4">
-              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                <Youtube className="w-5 h-5" />
-              </a>
-              <a href="https://www.instagram.com/xephra.official/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                <Twitch className="w-5 h-5" />
-              </a>
+          {/* Brand */}
+          <div>
+            <img src={logo} alt="XEPHRA Logo" className="h-8 w-auto mb-5" />
+            <p className="text-sm mb-6" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", lineHeight: 1.7 }}>
+              The ultimate gaming arena where champions are born. Join the competition and prove your skills.
+            </p>
+            <div className="flex gap-3">
+              {[
+                { Icon: Facebook, href: "https://www.instagram.com/xephra.official/" },
+                { Icon: Twitter, href: "https://www.instagram.com/xephra.official/" },
+                { Icon: Instagram, href: "https://www.instagram.com/xephra.official/" },
+                { Icon: Youtube, href: "https://www.instagram.com/xephra.official/" },
+                { Icon: Twitch, href: "https://www.instagram.com/xephra.official/" },
+              ].map(({ Icon, href }, i) => (
+                <a
+                  key={i}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-150"
+                  style={{ background: "rgba(75,85,99,0.15)", border: "1px solid rgba(75,85,99,0.25)", color: "#9CA3AF" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(0,229,255,0.1)";
+                    e.currentTarget.style.borderColor = "rgba(0,229,255,0.3)";
+                    e.currentTarget.style.color = "#00E5FF";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(75,85,99,0.15)";
+                    e.currentTarget.style.borderColor = "rgba(75,85,99,0.25)";
+                    e.currentTarget.style.color = "#9CA3AF";
+                  }}
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-bold font-montserrat text-[#D19F43] mb-4">Quick Links</h4>
+            <h5 className="text-sm font-semibold mb-5 tracking-wider uppercase" style={{ color: "#F8F9FA", fontFamily: "Poppins, sans-serif" }}>
+              Quick Links
+            </h5>
             <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={() => handleNavClick && handleNavClick('Home')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Home
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleNavClick && handleNavClick('Games')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Games
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleNavClick && handleNavClick('Tournaments')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Tournaments
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleNavClick && handleNavClick('Prices')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Prices
-                </button>
-              </li>
+              {["Home", "Games", "Tournaments", "Prices"].map((item) => (
+                <li key={item}>
+                  <button
+                    onClick={() => handleNavClick && handleNavClick(item)}
+                    style={footerLink}
+                    onMouseEnter={(e) => footerLinkHover(e, true)}
+                    onMouseLeave={(e) => footerLinkHover(e, false)}
+                  >
+                    {item}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Legal & Policies */}
+          {/* Legal */}
           <div>
-            <h4 className="text-lg font-bold font-montserrat text-[#D19F43] mb-4">Legal & Policies</h4>
+            <h5 className="text-sm font-semibold mb-5 tracking-wider uppercase" style={{ color: "#F8F9FA", fontFamily: "Poppins, sans-serif" }}>
+              Legal & Policies
+            </h5>
             <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={() => openPolicy('privacy')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Privacy Policy
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => openPolicy('refund')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Refund Policy
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => openPolicy('service')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Service Policy
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => openPolicy('return')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Return Policy
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => openPolicy('terms')}
-                  className="text-gray-300 hover:text-[#D19F43] transition-colors duration-200 text-sm text-left"
-                >
-                  Terms & Conditions
-                </button>
-              </li>
+              {[
+                { label: "Privacy Policy", key: "privacy" },
+                { label: "Refund Policy", key: "refund" },
+                { label: "Service Policy", key: "service" },
+                { label: "Return Policy", key: "return" },
+                { label: "Terms & Conditions", key: "terms" },
+              ].map(({ label, key }) => (
+                <li key={key}>
+                  <button
+                    onClick={() => openPolicy(key)}
+                    style={footerLink}
+                    onMouseEnter={(e) => footerLinkHover(e, true)}
+                    onMouseLeave={(e) => footerLinkHover(e, false)}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact */}
           <div>
-            <h4 className="text-lg font-bold font-montserrat text-[#D19F43] mb-4">Contact Us</h4>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-[#D19F43]" />
-                <span className="text-gray-300 text-sm">officialxephra@gmail.com</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 text-[#D19F43]" />
-                <span className="text-gray-300 text-sm">(+92) 339 6969698</span>
-              </div>
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-4 h-4 text-[#D19F43] mt-0.5" />
-                <span className="text-gray-300 text-sm">
-                  Al Ghurair Giga Westria road,<br /> Plaza No #34 2nd Floor,<br /> DHA phase 2, Islamabad
+            <h5 className="text-sm font-semibold mb-5 tracking-wider uppercase" style={{ color: "#F8F9FA", fontFamily: "Poppins, sans-serif" }}>
+              Contact Us
+            </h5>
+            <div className="space-y-4">
+              {[
+                { Icon: Mail, text: "officialxephra@gmail.com" },
+                { Icon: Phone, text: "(+92) 339 6969698" },
+              ].map(({ Icon, text }, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "#00E5FF" }} />
+                  <span className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>{text}</span>
+                </div>
+              ))}
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#00E5FF" }} />
+                <span className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", lineHeight: 1.6 }}>
+                  Al Ghurair Giga Westria road,<br />Plaza No #34 2nd Floor,<br />DHA phase 2, Islamabad
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-700 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-gray-400 text-sm">
-              © 2025 XEPHRA. All rights reserved. Developed by TechxServe for gamers.
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-xs">
-              <button 
-                onClick={() => openPolicy('privacy')}
-                className="text-gray-400 hover:text-[#D19F43] transition-colors"
-              >
-                Privacy
-              </button>
-              <button 
-                onClick={() => openPolicy('terms')}
-                className="text-gray-400 hover:text-[#D19F43] transition-colors"
-              >
-                Terms
-              </button>
-              <Link to="/login" className="text-gray-400 hover:text-[#D19F43] transition-colors">
-                Login
-              </Link>
-              <Link to="/signup" className="text-gray-400 hover:text-[#D19F43] transition-colors">
-                Signup
-              </Link>
-            </div>
+        {/* Bottom bar */}
+        <div
+          className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
+          style={{ borderTop: "1px solid rgba(75,85,99,0.2)" }}
+        >
+          <p className="text-xs" style={{ color: "#4B5563", fontFamily: "Inter, sans-serif" }}>
+            © 2025 XEPHRA. All rights reserved. Developed by TechxServe for gamers.
+          </p>
+          <div className="flex flex-wrap gap-5">
+            {[
+              { label: "Privacy", key: "privacy", type: "policy" },
+              { label: "Terms", key: "terms", type: "policy" },
+              { label: "Login", to: "/login", type: "link" },
+              { label: "Sign Up", to: "/signup", type: "link" },
+            ].map(({ label, key, to, type }) => (
+              type === "link" ? (
+                <Link
+                  key={label}
+                  to={to}
+                  className="text-xs transition-colors duration-150"
+                  style={{ color: "#4B5563", fontFamily: "Inter, sans-serif" }}
+                  onMouseEnter={(e) => (e.target.style.color = "#00E5FF")}
+                  onMouseLeave={(e) => (e.target.style.color = "#4B5563")}
+                >
+                  {label}
+                </Link>
+              ) : (
+                <button
+                  key={label}
+                  onClick={() => openPolicy(key)}
+                  className="text-xs transition-colors duration-150"
+                  style={{ color: "#4B5563", fontFamily: "Inter, sans-serif", background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#4B5563")}
+                >
+                  {label}
+                </button>
+              )
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Policy Popup Modal */}
+      {/* Policy Modal */}
       {activePolicy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
-          <div className="bg-gray-900 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-700">
-            {/* Modal Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-700">
-              <h2 className="text-2xl font-bold font-montserrat bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
-                {activePolicy === 'privacy' && 'Privacy Policy'}
-                {activePolicy === 'refund' && 'Refund Policy'}
-                {activePolicy === 'service' && 'Service Policy'}
-                {activePolicy === 'return' && 'Return Policy'}
-                {activePolicy === 'terms' && 'Terms & Conditions'}
-              </h2>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.75)" }}
+          onClick={closePolicy}
+        >
+          <div
+            className="rounded-lg w-full max-w-3xl max-h-[90vh] overflow-hidden animate-fade-in"
+            style={{
+              background: "#0A0E27",
+              border: "1px solid rgba(0,229,255,0.2)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="flex items-center justify-between px-8 py-6"
+              style={{ borderBottom: "1px solid rgba(75,85,99,0.2)" }}
+            >
+              <h3 className="text-xl font-bold" style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}>
+                {activePolicy === "privacy" && "Privacy Policy"}
+                {activePolicy === "refund" && "Refund Policy"}
+                {activePolicy === "service" && "Service Policy"}
+                {activePolicy === "return" && "Return Policy"}
+                {activePolicy === "terms" && "Terms & Conditions"}
+              </h3>
               <button
                 onClick={closePolicy}
-                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-full"
+                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+                style={{ color: "#9CA3AF" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#F8F9FA")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-            
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+            <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div
+                className="text-sm leading-relaxed whitespace-pre-line"
+                style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+              >
                 {policyContent[activePolicy]}
               </div>
             </div>
-            
-            {/* Modal Footer */}
-            <div className="p-6 border-t border-gray-700 bg-gray-800/50">
-              <button
-                onClick={closePolicy}
-                className="px-6 py-2 bg-gradient-to-r from-[#D19F43] to-[#eb9a0d] text-black font-semibold rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300"
-              >
+            <div
+              className="px-8 py-5 flex justify-end"
+              style={{ borderTop: "1px solid rgba(75,85,99,0.2)", background: "rgba(15,23,42,0.5)" }}
+            >
+              <button onClick={closePolicy} className="btn-primary py-2 px-6 text-sm">
                 Close
               </button>
             </div>

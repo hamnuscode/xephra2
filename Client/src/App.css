@@ -1,4 +1,73 @@
-/* Add these in your global CSS file */
-@import "~slick-carousel/slick/slick.css"; 
-@import "~slick-carousel/slick/slick-theme.css";
+/* App-level overrides */
+#root {
+  min-height: 100vh;
+  background-color: #0A0E27;
+}
 
+/* React-Toastify dark theme overrides */
+.Toastify__toast {
+  background: rgba(15, 23, 42, 0.98) !important;
+  color: #F8F9FA !important;
+  border: 1px solid rgba(0, 229, 255, 0.25) !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.Toastify__toast--success {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.Toastify__toast--error {
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.Toastify__toast--warning {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.Toastify__progress-bar {
+  background: #00E5FF !important;
+}
+
+.Toastify__progress-bar--success {
+  background: #10B981 !important;
+}
+
+.Toastify__progress-bar--error {
+  background: #EF4444 !important;
+}
+
+.Toastify__close-button {
+  color: #9CA3AF !important;
+}
+
+/* React-Hot-Toast overrides */
+[data-hot-toast] {
+  background: rgba(15, 23, 42, 0.98) !important;
+  color: #F8F9FA !important;
+  border: 1px solid rgba(0, 229, 255, 0.25) !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Slick carousel dots */
+.slick-dots li button:before {
+  color: rgba(0, 229, 255, 0.5) !important;
+  font-size: 8px !important;
+}
+.slick-dots li.slick-active button:before {
+  color: #00E5FF !important;
+  opacity: 1 !important;
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease-out, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}

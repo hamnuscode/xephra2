@@ -1,193 +1,272 @@
-import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import React, { useState } from "react";
+import { Check } from "lucide-react";
 
-export default function PricesV2({dark}) {
-  const plans = [
-    {
-      name: "WEEKLY PLAN",
-      price: "PKR 749",
-      period: "1 Week",
-      features: [
-        "Perfect For Casual Gamers who want to join the fun and compete",
-        "Includes access to tournaments for one week",
-        "Enjoy a guaranteed spot in the tournament and basic prizes"
-      ],
-      popular: false
-    },
-    {
-      name: "MONTHLY PLAN",
-      price: "PKR 1,499",
-      period: "1 Month",
-      features: [
-        "Perfect for Regular Gamers who want consistent access",
-        "Includes access to all tournaments for one month",
-        "Enjoy premium tournaments and better prize pools"
-      ],
-      popular: true
-    },
-    {
-      name: "QUARTERLY PLAN", 
-      price: "PKR 3,999",
-      period: "3 Months",
-      features: [
-        "Perfect For Serious Gamers who want great value",
-        "Includes access to all tournaments for three months",
-        "Enjoy VIP status, exclusive tournaments and big prizes"
-      ],
-      popular: false
-    }
-  ];
+const plans = [
+  {
+    name: "WEEKLY",
+    price: "PKR 749",
+    period: "1 Week",
+    features: [
+      "Perfect for casual gamers wanting to compete",
+      "Access to tournaments for one week",
+      "Guaranteed spot and basic prizes",
+    ],
+    popular: false,
+    accent: "#00E5FF",
+  },
+  {
+    name: "MONTHLY",
+    price: "PKR 1,499",
+    period: "1 Month",
+    features: [
+      "Perfect for regular gamers with consistent access",
+      "Access to all tournaments for one month",
+      "Premium tournaments and better prize pools",
+    ],
+    popular: true,
+    accent: "#6D28D9",
+  },
+  {
+    name: "QUARTERLY",
+    price: "PKR 3,999",
+    period: "3 Months",
+    features: [
+      "Perfect for serious gamers wanting great value",
+      "Access to all tournaments for three months",
+      "VIP status, exclusive tournaments, big prizes",
+    ],
+    popular: false,
+    accent: "#FF7A00",
+  },
+];
 
+export default function PricesV2() {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const handlePurchaseClick = (plan) => {
-    setSelectedPlan(plan);
-    setShowPopup(true);
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
-    setSelectedPlan(null);
-  };
-
   return (
-    <div className={`m-4 sm:m-8 lg:m-16 p-4 sm:p-6 lg:p-8 rounded-md shadow-2xl shadow-gray-950 pb-8 sm:pb-10 backdrop-blur-sm ${
-              dark ? "bg-[#854951] bg-opacity-[0.4]" : "bg-[#2321225d]"
-            }`}>
-
-      <div className="relative z-10 container mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-12 md:py-16">
+    <section className="py-24 px-6" style={{ background: "rgba(6, 9, 25, 0.8)" }}>
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h1 className="font-bold mb-3 sm:mb-4 font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent text-center text-3xl sm:text-3xl md:text-4xl lg:text-5xl" style={{
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            Choose your plan
-          </h1>
-          <p className="bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-6 sm:mb-8 px-4">
-            Get ready for ultimate Gaming Tournament
+        <div className="text-center mb-16">
+          <div
+            className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+            style={{
+              background: "rgba(255, 122, 0, 0.08)",
+              border: "1px solid rgba(255, 122, 0, 0.2)",
+              color: "#FF7A00",
+              fontFamily: "IBM Plex Mono, monospace",
+            }}
+          >
+            Subscription Plans
+          </div>
+          <h2
+            className="text-4xl sm:text-5xl font-bold mb-4"
+            style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA", letterSpacing: "-0.02em" }}
+          >
+            Choose Your Plan
+          </h2>
+          <p className="text-lg max-w-xl mx-auto" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+            Get ready for the ultimate gaming tournament experience.
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto">
-          {plans.map((plan, index) => (
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {plans.map((plan, i) => (
             <div
-              key={index}
-              className={`relative bg-black bg-opacity-60 rounded-lg p-4 sm:p-6 md:p-8 border transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl ${
-                plan.popular 
-                  ? 'border-[#D19F43] shadow-lg shadow-amber-500/25' 
-                  : 'border-[#854951] hover:border-[#D19F43]'
-              } ${
-                // Center the popular card on medium screens with 2-column layout
-                plan.popular && 'md:col-span-2 lg:col-span-1 md:max-w-md md:mx-auto lg:max-w-none'
-              }`}
+              key={i}
+              className="relative rounded-lg p-8 flex flex-col transition-all duration-200"
+              style={{
+                background: plan.popular ? `rgba(109, 40, 217, 0.08)` : "rgba(15, 23, 42, 0.95)",
+                border: plan.popular
+                  ? `1px solid rgba(109, 40, 217, 0.5)`
+                  : `1px solid rgba(0, 229, 255, 0.12)`,
+                boxShadow: plan.popular ? "0 8px 32px rgba(109, 40, 217, 0.2)" : "0 2px 8px rgba(0,0,0,0.3)",
+              }}
+              onMouseEnter={(e) => {
+                if (!plan.popular) {
+                  e.currentTarget.style.borderColor = `rgba(0,229,255,0.3)`;
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!plan.popular) {
+                  e.currentTarget.style.borderColor = "rgba(0, 229, 255, 0.12)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+                }
+              }}
             >
-              {/* Plan Badge */}
-              <div className="text-center mb-4 sm:mb-6">
-                <span className={`inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wider ${
-                  plan.popular 
-                    ? 'bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-black' 
-                    : 'bg-gray-700 text-amber-300'
-                }`}>
+              {/* Most popular badge */}
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span
+                    className="px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+                    style={{
+                      background: "linear-gradient(135deg, #6D28D9, #00E5FF)",
+                      color: "#fff",
+                      fontFamily: "IBM Plex Mono, monospace",
+                    }}
+                  >
+                    Most Popular
+                  </span>
+                </div>
+              )}
+
+              {/* Plan name */}
+              <div className="mb-6">
+                <span
+                  className="text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full"
+                  style={{
+                    background: `${plan.accent}15`,
+                    border: `1px solid ${plan.accent}40`,
+                    color: plan.accent,
+                    fontFamily: "IBM Plex Mono, monospace",
+                  }}
+                >
                   {plan.name}
                 </span>
               </div>
 
               {/* Price */}
-              <div className="text-center mb-6 sm:mb-8">
-                <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent mb-1 sm:mb-2">
+              <div className="mb-8">
+                <div
+                  className="text-4xl font-bold mb-1"
+                  style={{ fontFamily: "IBM Plex Mono, monospace", color: "#F8F9FA" }}
+                >
                   {plan.price}
                 </div>
-                <div className="text-amber-200 text-xs sm:text-sm tracking-wide">
-                  {plan.period}
+                <div className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+                  per {plan.period.toLowerCase()}
                 </div>
               </div>
 
               {/* Features */}
-              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                {plan.features.map((feature, featureIndex) => (
-                  <div key={featureIndex} className="flex items-start space-x-2 sm:space-x-3">
-                    <div className="flex-shrink-0 mt-0.5 sm:mt-1">
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#D19F43] flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-black" />
-                      </div>
+              <ul className="space-y-4 mb-8 flex-grow">
+                {plan.features.map((feat, fi) => (
+                  <li key={fi} className="flex items-start gap-3">
+                    <div
+                      className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center"
+                      style={{ background: `${plan.accent}20`, border: `1px solid ${plan.accent}50` }}
+                    >
+                      <Check className="w-3 h-3" style={{ color: plan.accent }} />
                     </div>
-                    <p className="text-amber-100 text-xs sm:text-sm leading-relaxed">
-                      {feature}
-                    </p>
-                  </div>
+                    <span className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+                      {feat}
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
 
-              {/* Purchase Button */}
+              {/* CTA */}
               <button
-                className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-bold text-black text-sm sm:text-base transition-all duration-300 transform hover:scale-105 ${
-                  plan.popular
-                    ? 'bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#D19F43] shadow-lg'
-                    : 'bg-[#D19F43] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d]'
-                }`}
-                onClick={() => handlePurchaseClick(plan)}
+                onClick={() => { setSelectedPlan(plan); setShowPopup(true); }}
+                className="w-full py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-150"
+                style={{
+                  background: plan.popular
+                    ? "linear-gradient(135deg, #6D28D9, #00E5FF)"
+                    : `${plan.accent}18`,
+                  border: `1px solid ${plan.accent}50`,
+                  color: plan.popular ? "#fff" : plan.accent,
+                  fontFamily: "Inter, sans-serif",
+                }}
+                onMouseEnter={(e) => {
+                  if (!plan.popular) {
+                    e.currentTarget.style.background = `${plan.accent}28`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!plan.popular) {
+                    e.currentTarget.style.background = `${plan.accent}18`;
+                  }
+                }}
               >
                 Purchase Now
               </button>
-
-              {/* Popular badge */}
-              {plan.popular && (
-                <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-black px-3 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg">
-                    MOST POPULAR
-                  </span>
-                </div>
-              )}
             </div>
           ))}
         </div>
 
-        {/* Popup Modal */}
-        {showPopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-            <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full relative">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
-                onClick={closePopup}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center text-[#D19F43]">How to Purchase</h2>
-              <ol className="list-decimal list-inside text-gray-800 space-y-2 mb-4">
-                <li>
-                  <span className="font-semibold">Create an account</span> if you haven't already.
-                </li>
-                <li>
-                  <span className="font-semibold">Go to the Payment Portal page</span> from the menu or navigation.
-                </li>
-                <li>
-                  <span className="font-semibold">Choose and activate your subscription</span> from there.
-                </li>
-              </ol>
-              <div className="text-center">
-                <button
-                  className="bg-[#D19F43] hover:bg-[#b88a2c] text-black font-bold py-2 px-6 rounded-lg transition-all duration-200"
-                  onClick={closePopup}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Bottom decorative text */}
-        <div className="text-center mt-8 sm:mt-12 md:mt-16">
-          <p className="text-amber-200 text-sm sm:text-base md:text-lg opacity-80 px-4">
-            Join thousands of gamers competing for glory and prizes
-          </p>
-        </div>
+        <p
+          className="text-center mt-12 text-sm"
+          style={{ color: "#4B5563", fontFamily: "Inter, sans-serif" }}
+        >
+          Join thousands of gamers competing for glory and prizes
+        </p>
       </div>
-    </div>
+
+      {/* Modal */}
+      {showPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: "rgba(0,0,0,0.7)" }}
+          onClick={() => setShowPopup(false)}
+        >
+          <div
+            className="rounded-lg p-8 w-full max-w-md animate-fade-in"
+            style={{
+              background: "#0A0E27",
+              border: "1px solid rgba(0,229,255,0.2)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3
+                className="text-xl font-bold"
+                style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+              >
+                How to Purchase
+              </h3>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+                style={{ color: "#9CA3AF" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#F8F9FA")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <ol className="space-y-4 mb-8">
+              {[
+                "Create an account if you haven't already.",
+                "Go to the Payment Portal page from your dashboard.",
+                "Choose and activate your subscription from there.",
+              ].map((step, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
+                    style={{
+                      background: "rgba(0,229,255,0.12)",
+                      border: "1px solid rgba(0,229,255,0.3)",
+                      color: "#00E5FF",
+                      fontFamily: "IBM Plex Mono, monospace",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+                    {step}
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="btn-primary w-full"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

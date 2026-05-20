@@ -1,423 +1,228 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Import icons
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { getEvents, deleteEventById , editEvent} from "../../redux/features/eventsSlice";
+import { getEvents, deleteEventById, editEvent } from "../../redux/features/eventsSlice";
 import Loading from "../../utils/Loading/Loading";
 import toast from "react-hot-toast";
 
-const PostedEvents = ({ setActiveMenu, dark }) => {
+const inputStyle = {
+  background: "rgba(15,23,42,0.8)",
+  border: "1px solid rgba(75,85,99,0.3)",
+  color: "#F8F9FA",
+  borderRadius: 8,
+  padding: "8px 12px",
+  width: "100%",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 14,
+  outline: "none",
+};
+
+const labelStyle = {
+  color: "#9CA3AF",
+  fontFamily: "Inter, sans-serif",
+  fontSize: 13,
+  marginBottom: 4,
+  display: "block",
+};
+
+const PostedEvents = ({ setActiveMenu }) => {
   const dispatch = useDispatch();
-  const { loading, error, events, message, event } = useSelector(
-    (state) => state.events
-  );
-  const isAdmin = true;
+  const { loading, error, events, message, event } = useSelector((state) => state.events);
 
   useEffect(() => {
-    const loadingToast = toast.loading("Loading events...");
-    dispatch(getEvents()).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success("Events loaded successfully!");
-      }
-      // Error will be handled by useEffect below
-    });
-  }, [dispatch , event]);
+    dispatch(getEvents());
+  }, [dispatch, event]);
 
-
+  useEffect(() => {
+    if (message && !loading) toast.success(message);
+    if (error && !loading) toast.error(error);
+  }, [message, error, loading]);
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
 
-  const changeMenu = () => {
-    setActiveMenu("newEvents");
-  };
+  const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const DeleteEvent = (tournament) => {
-    setEventToDelete(tournament);
-    setShowDeleteModal(true);
-  };
-
+  const DeleteEvent = (tournament) => { setEventToDelete(tournament); setShowDeleteModal(true); };
+  const cancelDelete = () => { setShowDeleteModal(false); setEventToDelete(null); };
   const confirmDelete = () => {
     if (!eventToDelete) return;
-    
-    const loadingToast = toast.loading("Deleting event...");
-    
+    const t = toast.loading("Deleting event...");
     dispatch(deleteEventById(eventToDelete._id)).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success("Event deleted successfully!");
+      toast.dismiss(t);
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("Event deleted!");
         setShowDeleteModal(false);
         setEventToDelete(null);
       }
-      // Error will be handled by useEffect above
     });
   };
 
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setEventToDelete(null);
-    toast.info("Delete cancelled");
-  };
-
-  const onEdit = (tournament) => {
-    setSelectedTournament(tournament);
-    setShowEditModal(true);
-    toast.success(`Editing "${tournament.title}"`);
-  };
-
-  // Handle success and error messages
-  useEffect(() => {
-    if (message && !loading) {
-      toast.success(message);
-    }
-    if (error && !loading) {
-      toast.error(error);
-    }
-  }, [message, error, loading]);
-
-  const saveEdit = (updatedTournament) => {
-    const id = updatedTournament._id;
-    const loadingToast = toast.loading("Updating event...");
-    
-    dispatch(editEvent({id, updatedData :updatedTournament})).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success("Event updated successfully!");
+  const onEdit = (tournament) => { setSelectedTournament(tournament); setShowEditModal(true); };
+  const saveEdit = (updated) => {
+    const t = toast.loading("Updating event...");
+    dispatch(editEvent({ id: updated._id, updatedData: updated })).then((result) => {
+      toast.dismiss(t);
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("Event updated!");
         setShowEditModal(false);
         setSelectedTournament(null);
       }
-      // Error will be handled by useEffect above
     });
   };
-  if (loading) {
-    return <Loading />;
-  }
 
-  const sortedEvents = [...events].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  const TournamentCard = ({
-    _id,
-    title,
-    game,
-    gameMode,
-    date,
-    time,
-    description,
-    image,
-    prizePool,
-    rules,
-    // onDelete,
-    onEdit,
-  }) => {
-    const imageUrl = `${process.env.REACT_APP_BACKEND}/${image}`;
-
-    return (
-      <div className="bg-[#000000] rounded-lg shadow-lg overflow-hidden group transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
-        <Link to={`/eventadmin/${_id}`} className="relative block w-full">
-          <img
-            className="w-full h-56 object-cover"
-            src={imageUrl}
-            alt={title}
-          />
-           <h3 className="drop-shadow-2xl absolute bottom-0 left-0 w-[55%] text-2xl font-bold text-white [text-shadow:_2px_2px_4px_rgba(0,0,0,0.8)] px-4 py-2">{title}</h3>
-        </Link>
-        <div className="p-4">
-          <Link to={`/eventadmin/${_id}`}>         
-          <p className="text-[#C9B796] text-lg font-bold mt-1">{game}</p>
-          <p className="text-[#D4AD66] text-sm font-semibold mb-1">Mode: {gameMode?.charAt(0).toUpperCase() + gameMode?.slice(1)}</p>
-          <p className="text-sm text-gray-400">
-            <span className="bg-[#302A27] font-bold px-2 w-1/2">{date}</span> •<span className="bg-[#302A27] font-bold px-2 w-1/2">{time}</span> 
-          </p>
-          <p className="text-[#C9B796] mt-2  line-clamp-3">{description}</p>
-          </Link>
-          <div className="mt-4 flex justify-between items-center">
-            <span className="text-xl font-bold text-white">Prize Pool: PKR {prizePool}</span>
-            {isAdmin && (
-              <div className="flex space-x-2">
-                <button
-                  onClick={() =>
-                    onEdit({
-                      _id,
-                      title,
-                      game,
-                      gameMode,
-                      date,
-                      time,
-                      description,
-                      image,
-                      prizePool,
-                      rules,
-                    })
-                  }
-                  className="text-[#b8a896] hover:text-[#8f404f]"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => DeleteEvent({
-                    _id,
-                    title,
-                    game,
-                    date,
-                    time,
-                    description,
-                    image,
-                    prizePool,
-                    rules,
-                  })}
-                  className="text-[#b8a896] hover:text-[#8f404f]"
-                >
-                  <FaTrash />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
+  if (loading) return <Loading />;
 
   return (
-    <div
-      className={`mx-auto pt-0 pb-10 px-4 rounded-lg min-h-full shadow-2xl shadow-gray-950 drop-shadow-[3px_3px_10px_rgba(0,0,0,0.6)] backdrop-blur-sm bg-[#492f3418] bg-opacity-[.03] ${
-        dark
-          ? "":""}`}
-    >
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent py-6 drop-shadow-[3px_3px_10px_rgba(0,0,0,0.6)]">
-          POSTED EVENTS
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2
+          className="text-2xl font-bold"
+          style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+        >
+          Posted Events
         </h2>
-        {isAdmin && (
-          <Link onClick={changeMenu}>
-            <button
-              className={`flex items-center text-[#C9B796] px-2 sm:px-6 py-2 rounded-md transition text-sm sm:text-base ${
-                dark
-                  ? "bg-[#302B27] border-[1px] border-[#C9B796] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:text-black"
-                  : "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] border-[1px] border-[#C9B796] text-black hover:bg-[#A15D66]"
-              } `}
-            >
-              <FaPlus className="mr-2" /> New Event
-            </button>
-          </Link>
-        )}
-      </div>
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {sortedEvents.length === 0
-          ? "No events posted yet"
-          : sortedEvents?.map((tournament, index) => (
-              <TournamentCard
-                key={index}
-                {...tournament}
-                // onDelete={onDelete}
-                onEdit={onEdit}
-              />
-            ))}
+        <button
+          onClick={() => setActiveMenu("newEvents")}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150"
+          style={{
+            background: "rgba(0,229,255,0.08)",
+            border: "1px solid rgba(0,229,255,0.25)",
+            color: "#00E5FF",
+            fontFamily: "Inter, sans-serif",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.15)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.08)")}
+        >
+          <FaPlus className="w-3 h-3" /> New Event
+        </button>
       </div>
 
-      {/* {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div
-            className={`p-6 rounded-lg ${
-              dark ? "bg-[#69363F]" : "bg-[#232122]"
-            }`}
-          >
-            <h2 className="text-lg font-bold mb-4 text-white">
-              Confirm Deletion
-            </h2>
-            <p className="text-white">
-              Are you sure you want to delete "{selectedTournament.title}"?
-            </p>
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete(selectedTournament._id)}
-                className={`px-4 py-2 text-white rounded ${
-                  dark
-                    ? "bg-[#302B27] hover:bg-[#49413C]"
-                    : "bg-[#854951] hover:bg-[#A15D66]"
-                }`}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+      {/* Grid */}
+      {sortedEvents.length === 0 ? (
+        <div
+          className="text-center py-16 rounded-xl"
+          style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(75,85,99,0.2)", color: "#9CA3AF" }}
+        >
+          No events posted yet.
         </div>
-      )} */}
-
-      {showEditModal && (
-       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-       <div
-         className={`p-6 rounded-lg shadow-lg w-[90%] max-w-lg overflow-y-scroll h-[90vh] sm:max-h-[none] ${
-           dark ? "bg-[#69363F]" : "bg-[#232122]"
-         }`}
-       >
-         <h2 className="text-lg font-bold mb-4 text-[#B6A99A]">Edit Tournament</h2>
-         <form
-           onSubmit={() => {
-             saveEdit(selectedTournament);
-           }}
-         >
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Title</label>
-             <input
-               type="text"
-               value={selectedTournament.title}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   title: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Game</label>
-             <input
-               type="text"
-               value={selectedTournament.game}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   game: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Date</label>
-             <input
-               type="date"
-               value={selectedTournament.date}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   date: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Time</label>
-             <input
-               type="time"
-               value={selectedTournament.time}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   time: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Prize Pool</label>
-             <input
-               type="text"
-               value={selectedTournament.prizePool}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   prizePool: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Description</label>
-             <textarea
-               value={selectedTournament.description}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   description: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="mb-4">
-             <label className="block text-sm font-medium text-[#B6A99A]">Rules</label>
-             <textarea
-               value={selectedTournament.rules}
-               onChange={(e) =>
-                 setSelectedTournament((prev) => ({
-                   ...prev,
-                   rules: e.target.value,
-                 }))
-               }
-               className="w-full px-3 py-2 border rounded-lg"
-             />
-           </div>
-           <div className="flex justify-end space-x-2">
-             <button
-               onClick={() => {
-                 setShowEditModal(false);
-                 setSelectedTournament(null);
-                 toast.info("Edit cancelled");
-               }}
-               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-             >
-               Cancel
-             </button>
-             <button
-               type="submit"
-               className={`px-4 py-2 text-white rounded ${
-                 dark
-                   ? "bg-[#302B27] hover:bg-[#49413C]"
-                   : "bg-[#854951] hover:bg-[#A15D66]"
-               } `}
-             >
-               Save
-             </button>
-           </div>
-         </form>
-       </div>
-     </div>
-     
-      
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedEvents.map((tournament) => (
+            <TournamentCard
+              key={tournament._id}
+              {...tournament}
+              onEdit={onEdit}
+              onDelete={DeleteEvent}
+            />
+          ))}
+        </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Edit Modal */}
+      {showEditModal && selectedTournament && (
+        <div
+          className="modal-backdrop"
+          onClick={() => { setShowEditModal(false); setSelectedTournament(null); }}
+        >
+          <div
+            className="rounded-xl p-6 w-full max-w-lg overflow-y-auto"
+            style={{
+              background: "#0A0E27",
+              border: "1px solid rgba(0,229,255,0.2)",
+              maxHeight: "90vh",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              className="text-xl font-bold mb-5"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
+              Edit Tournament
+            </h2>
+            <form
+              onSubmit={(e) => { e.preventDefault(); saveEdit(selectedTournament); }}
+              className="space-y-4"
+            >
+              {[
+                { label: "Title", key: "title", type: "text" },
+                { label: "Game", key: "game", type: "text" },
+                { label: "Date", key: "date", type: "date" },
+                { label: "Time", key: "time", type: "time" },
+                { label: "Prize Pool", key: "prizePool", type: "text" },
+              ].map(({ label, key, type }) => (
+                <div key={key}>
+                  <label style={labelStyle}>{label}</label>
+                  <input
+                    type={type}
+                    value={selectedTournament[key] || ""}
+                    onChange={(e) => setSelectedTournament((p) => ({ ...p, [key]: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              ))}
+              {["description", "rules"].map((key) => (
+                <div key={key}>
+                  <label style={labelStyle}>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                  <textarea
+                    rows={3}
+                    value={selectedTournament[key] || ""}
+                    onChange={(e) => setSelectedTournament((p) => ({ ...p, [key]: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              ))}
+              <div className="flex gap-3 justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowEditModal(false); setSelectedTournament(null); }}
+                  className="px-4 py-2 rounded-lg text-sm"
+                  style={{ background: "rgba(75,85,99,0.2)", border: "1px solid rgba(75,85,99,0.3)", color: "#9CA3AF" }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary px-6 py-2 text-sm">
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
       {showDeleteModal && eventToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`p-6 rounded-lg shadow-lg max-w-md mx-4 ${
-            dark ? "bg-[#69363F]" : "bg-[#232122]"
-          }`}>
-            <h2 className="text-lg font-bold mb-4 text-white">
+        <div className="modal-backdrop" onClick={cancelDelete}>
+          <div
+            className="modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              className="text-xl font-bold mb-3"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
               Confirm Deletion
             </h2>
-            <p className="text-white mb-6">
-              Are you sure you want to delete "{eventToDelete.title}"?
+            <p className="mb-2" style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}>
+              Delete <strong>"{eventToDelete.title}"</strong>?
             </p>
-            <p className="text-gray-300 text-sm mb-6">
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
+            <p className="text-sm mb-6" style={{ color: "#9CA3AF" }}>This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
               <button
                 onClick={cancelDelete}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{ background: "rgba(75,85,99,0.2)", border: "1px solid rgba(75,85,99,0.3)", color: "#9CA3AF" }}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", color: "#EF4444" }}
               >
                 Delete
               </button>
@@ -428,5 +233,96 @@ const PostedEvents = ({ setActiveMenu, dark }) => {
     </div>
   );
 };
+
+function TournamentCard({ _id, title, game, gameMode, date, time, description, image, prizePool, rules, onEdit, onDelete }) {
+  const imageUrl = `${process.env.REACT_APP_BACKEND}/${image}`;
+  return (
+    <div
+      className="rounded-xl overflow-hidden transition-transform duration-200"
+      style={{
+        background: "rgba(15,23,42,0.9)",
+        border: "1px solid rgba(75,85,99,0.2)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.borderColor = "rgba(0,229,255,0.25)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.borderColor = "rgba(75,85,99,0.2)";
+      }}
+    >
+      <Link to={`/eventadmin/${_id}`} className="block relative" style={{ height: 200 }}>
+        <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <h3
+            className="text-base font-semibold"
+            style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+          >
+            {title}
+          </h3>
+        </div>
+      </Link>
+      <div className="p-4">
+        <Link to={`/eventadmin/${_id}`}>
+          <p
+            className="text-sm font-semibold mb-1"
+            style={{ color: "#00E5FF", fontFamily: "IBM Plex Mono, monospace" }}
+          >
+            {game}
+            {gameMode && (
+              <span style={{ color: "#9CA3AF" }}> · {gameMode.charAt(0).toUpperCase() + gameMode.slice(1)}</span>
+            )}
+          </p>
+          <p
+            className="text-xs mb-2"
+            style={{ color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" }}
+          >
+            {date && new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            {time && ` · ${time}`}
+          </p>
+          <p
+            className="text-sm line-clamp-2 mb-3"
+            style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}
+          >
+            {description}
+          </p>
+        </Link>
+        <div className="flex items-center justify-between">
+          <span
+            className="text-sm font-bold"
+            style={{ color: "#FF7A00", fontFamily: "IBM Plex Mono, monospace" }}
+          >
+            PKR {prizePool}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onEdit({ _id, title, game, gameMode, date, time, description, image, prizePool, rules })}
+              className="p-2 rounded-md transition-colors"
+              style={{ color: "#9CA3AF" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#00E5FF")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              <FaEdit className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => onDelete({ _id, title, game, date, time, description, image, prizePool, rules })}
+              className="p-2 rounded-md transition-colors"
+              style={{ color: "#9CA3AF" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#EF4444")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              <FaTrash className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default PostedEvents;

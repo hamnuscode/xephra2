@@ -15,7 +15,7 @@ import {
   BarElement,
 } from "chart.js";
 import { Link } from "react-router-dom";
-import { getEvents,fetchHostedTournaments } from "../../redux/features/eventsSlice";
+import { getEvents, fetchHostedTournaments } from "../../redux/features/eventsSlice";
 import {
   getAllUsers,
   deleteUser,
@@ -28,7 +28,6 @@ import { getTopRanking } from "../../redux/features/rankingSlice";
 import { gettotaluserandevents } from "../../redux/features/profileSlice";
 import toast from "react-hot-toast";
 
-// Register necessary Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,12 +41,26 @@ ChartJS.register(
   Colors
 );
 
-const DashboardAdmin = ({ setActiveMenu, dark }) => {
+const sliderSettings = (count) => ({
+  dots: false,
+  infinite: count >= 3,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  autoplay: count >= 3,
+  autoplaySpeed: 3000,
+  responsive: [
+    { breakpoint: 1200, settings: { slidesToShow: Math.min(2, count), slidesToScroll: 1 } },
+    { breakpoint: 450, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+  ],
+});
+
+const DashboardAdmin = ({ setActiveMenu }) => {
   const dispatch = useDispatch();
-  const { events,hostedEvents } = useSelector((state) => state.events);
+  const { events, hostedEvents } = useSelector((state) => state.events);
   const { users, profile } = useSelector((state) => state.profile);
   const { topranks } = useSelector((state) => state.ranking);
-  const { userCount, eventCount } = useSelector((state) => state.profile);
+  const { userCount, eventCount, error, loading } = useSelector((state) => state.profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -60,572 +73,439 @@ const DashboardAdmin = ({ setActiveMenu, dark }) => {
     dispatch(fetchHostedTournaments());
   }, []);
 
-  // Handle errors from profile actions
-  const { error } = useSelector((state) => state.profile);
-  const { loading } = useSelector((state) => state.profile);
-  
   useEffect(() => {
-    if (error && !loading) {
-      toast.error(error);
-    }
+    if (error && !loading) toast.error(error);
   }, [error, loading]);
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 450,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
+  const maxWeightedScore = Math.max(...topranks.map((u) => u.weightedScore), 1);
 
-  const sortedPostedEvents = [...events].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  const sortedCompletedEvents = [...hostedEvents].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-
-  const settings1 = {
-    dots: false,
-    infinite: sortedPostedEvents.length >= 3, // Jab 3 ya zyada events hon to infinite true hoga
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: sortedPostedEvents.length >= 3, // Jab 3 ya zyada events hon to autoplay on hoga
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: Math.min(2, sortedPostedEvents.length), // Jab 2 events ho to max 2 dikhayega
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 450,
-        settings: {
-          slidesToShow: 1, // Mobile screens pe ek ek slide dikhayega
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
-  const settings2 = {
-    dots: false,
-    infinite: sortedCompletedEvents.length >= 3, // Jab 3 ya zyada events hon to infinite true hoga
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: sortedCompletedEvents.length >= 3, // Jab 3 ya zyada events hon to autoplay on hoga
-    autoplaySpeed: 3000,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: Math.min(2, sortedCompletedEvents.length), // Jab 2 events ho to max 2 dikhayega
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 450,
-        settings: {
-          slidesToShow: 1, // Mobile screens pe ek ek slide dikhayega
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
-
-  const handleDelete = (user) => {
-    setUserToDelete(user);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = () => {
-    if (!userToDelete) return;
-    
-    const loadingToast = toast.loading("Deleting user...");
-    
-    dispatch(deleteUser(userToDelete.userId)).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success("User deleted successfully!");
-        setShowDeleteModal(false);
-        setUserToDelete(null);
-      }
-      // Error will be handled by useEffect below
-    });
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setUserToDelete(null);
-    toast.info("Delete cancelled");
-  };
-
-  const handleSuspend = (user) => {
-    const action = user.isSuspended ? "unsuspending" : "suspending";
-    const loadingToast = toast.loading(`${action} user...`);
-    
-    dispatch(suspendUser(user.userId)).then((result) => {
-      toast.dismiss(loadingToast);
-      if (result.meta.requestStatus === 'fulfilled') {
-        const message = user.isSuspended 
-          ? "User unsuspended successfully!" 
-          : "User suspended successfully!";
-        toast.success(message);
-      }
-      // Error will be handled by useEffect below
-    });
-  };
-  const handleProfileView = (userId) => {
-    dispatch(getUser(userId));
-    setIsModalOpen(true);
-  };
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  // Chart data for Analytics & Stats
   const analyticsData = {
     labels: ["January", "February", "March", "April", "May", "June"],
     datasets: [
       {
         label: "Total Events",
-        data:
-          eventCount.length > 0 ? eventCount.slice(0, 6) : [0, 0, 0, 0, 0, 0],
-        borderColor: "#DDA853",
-        backgroundColor: "black",
+        data: eventCount.length > 0 ? eventCount.slice(0, 6) : [0, 0, 0, 0, 0, 0],
+        borderColor: "#00E5FF",
+        backgroundColor: "rgba(0,229,255,0.05)",
         fill: true,
+        tension: 0.4,
+        pointBackgroundColor: "#00E5FF",
+        pointRadius: 4,
       },
       {
         label: "Active Users",
         data: userCount.length > 0 ? userCount.slice(0, 6) : [0, 0, 0, 0, 0, 0],
-        borderColor: "#C84C05",
-        backgroundColor: "black",
+        borderColor: "#6D28D9",
+        backgroundColor: "rgba(109,40,217,0.05)",
         fill: true,
+        tension: 0.4,
+        pointBackgroundColor: "#6D28D9",
+        pointRadius: 4,
       },
     ],
   };
 
-  const maxWightedScore = Math.max(
-    ...topranks.map((user) => user.weightedScore)
-  );
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" } },
+    },
+    scales: {
+      x: {
+        ticks: { color: "#9CA3AF" },
+        grid: { color: "rgba(75,85,99,0.15)" },
+      },
+      y: {
+        ticks: { color: "#9CA3AF" },
+        grid: { color: "rgba(75,85,99,0.15)" },
+      },
+    },
+  };
+
+  const handleDelete = (user) => { setUserToDelete(user); setShowDeleteModal(true); };
+  const cancelDelete = () => { setShowDeleteModal(false); setUserToDelete(null); };
+  const confirmDelete = () => {
+    if (!userToDelete) return;
+    const t = toast.loading("Deleting user...");
+    dispatch(deleteUser(userToDelete.userId)).then((result) => {
+      toast.dismiss(t);
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("User deleted successfully!");
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      }
+    });
+  };
+  const handleSuspend = (user) => {
+    const t = toast.loading(user.isSuspended ? "Unsuspending..." : "Suspending...");
+    dispatch(suspendUser(user.userId)).then((result) => {
+      toast.dismiss(t);
+      if (result.meta.requestStatus === "fulfilled")
+        toast.success(user.isSuspended ? "User unsuspended!" : "User suspended!");
+    });
+  };
+  const handleProfileView = (userId) => { dispatch(getUser(userId)); setIsModalOpen(true); };
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Hero Section for Admin */}
-      <div className="relative bg-cover bg-center h-56">
-        <div className=" w-full absolute inset-0  bg-opacity-50 text-left text-white mt-20 ">
-        <h1 className="drop-shadow-[2px_2px_3px_rgba(0,0,0,0.7)] bg-gradient-to-r from-[#e5b967] via-[#d1a759] to-[#f9f9f9] bg-clip-text text-transparent  w-1/2 text-5xl lg:text-[3.6rem] md:text-6xl sm:text-6xl sm:w-full font-bold">
-            Welcome Admin!
-          </h1>
-          <h2 className={`drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-clip-text text-transparent mt-7 lg:text-2xl md:text-2xl md:text-wrap sm:text-xl ${dark ? "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d]" : "text-white"}`}>
-            Manage and Monitor all the Gaming Events and Rankings Efficiently.
-          </h2>
-        </div>
+    <div className="space-y-6">
+      {/* Hero */}
+      <div
+        className="rounded-xl p-8"
+        style={{
+          background: "linear-gradient(135deg, rgba(0,229,255,0.06) 0%, rgba(109,40,217,0.06) 100%)",
+          border: "1px solid rgba(0,229,255,0.12)",
+        }}
+      >
+        <h1
+          className="text-4xl font-bold mb-2"
+          style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+        >
+          Welcome, Admin
+        </h1>
+        <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+          Manage and monitor all gaming events and rankings efficiently.
+        </p>
       </div>
 
-      {/* Analytics & Stats Dashboard Section */}
+      {/* Analytics */}
       <div
-        className={`p-4 rounded shadow-2xl shadow-gray-950  mt-8  backdrop-blur-sm ${dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#2321223d]"}`}
+        className="rounded-xl p-6"
+        style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
       >
         <h2
-          className={`lg:text-2xl md:text-xl sm:text-lg font-bold mb-4 ${
-            dark
-              ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-              : "text-white"
-          }`}
+          className="text-xl font-bold mb-5"
+          style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
         >
           Analytics & Stats
         </h2>
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-screen-xl grid grid-cols-1 md:grid-cols-1 gap-6 h-[300px]">
-            <div className="bg-[#232122] p-4 rounded shadow w-full h-[100%]">
-              <h3 className="text-lg text-white font-bold">
-                Total Events & Active Users
-              </h3>
-              <div className="w-full h-[250px]">
-                <Line
-                  data={analyticsData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false, // Ensures it stretches to fit container
-                    plugins: {
-                      legend: {
-                        labels: { color: "white" },
-                      },
-                    },
-                    scales: {
-                      x: { ticks: { color: "white" } },
-                      y: { ticks: { color: "white" } },
-                    },
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+        <div style={{ height: 280 }}>
+          <Line data={analyticsData} options={chartOptions} />
         </div>
+      </div>
 
-        {/* Main Section */}
-        <div className="grid grid-cols-12 gap-6 mt-8">
-          {/* Events Section */}
+      {/* Events + Rankings */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Events */}
+        <div className="col-span-12 lg:col-span-9 space-y-6">
           <div
-            className={`col-span-12 lg:col-span-9 backdrop-blur-sm p-4 rounded shadow-2xl shadow-gray-950 ${dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#232122]"}`}
+            className="rounded-xl p-6"
+            style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
           >
             <h2
-            className={`lg:text-2xl md:text-xl sm:text-lg font-bold mb-4 ${
-              dark
-                ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                : "text-white"
-            } `}
-          >
+              className="text-lg font-bold mb-4"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
               Posted Events
             </h2>
-            <Slider {...settings1}>
-              {events.map((event) => (
-                <Link
-                  to={`/eventadmin/${event?._id}`}
-                  key={event._id}
-                  className="flex-none p-1 flex flex-col h-full  min-h-[200px] hover:scale-105 transition duration-200"
-                >
-                  <div className="relative rounded-lg shadow flex flex-col h-full min-h-full">
-                    <img
-                      src={`${process.env.REACT_APP_BACKEND}/${event.image}`}
-                      alt={event.title}
-                      className="h-60 w-full object-cover rounded"
-                    />
-                    <div>
-                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/100 to-[#00000020] p-3">
-                        <h3 className="text-white text-lg font-bold drop-shadow-2xl [text-shadow:_2px_2px_4px_rgba(0,0,0,0.8)]">
+            {events.length === 0 ? (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No events posted yet.</p>
+            ) : (
+              <Slider {...sliderSettings(events.length)}>
+                {events.map((event) => (
+                  <Link to={`/eventadmin/${event._id}`} key={event._id} className="block p-1">
+                    <div
+                      className="relative rounded-lg overflow-hidden transition-transform duration-200"
+                      style={{ height: 200 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    >
+                      <img
+                        src={`${process.env.REACT_APP_BACKEND}/${event.image}`}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3
+                          className="text-sm font-semibold"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
                           {event.title}
                         </h3>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </Slider>
+                  </Link>
+                ))}
+              </Slider>
+            )}
+          </div>
+
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+          >
             <h2
-            className={`lg:text-2xl md:text-xl sm:text-lg font-bold mt-2 mb-4 ${
-              dark
-                ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                : "text-white"
-            } `}
+              className="text-lg font-bold mb-4"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
             >
               Completed Events
             </h2>
-            <Slider {...settings2}>
-              {hostedEvents.map((event) => (
-                <Link
-                  to={`/eventadmin/${event?._id}`}
-                  key={event._id}
-                  className="flex-none p-1 flex flex-col h-full  min-h-[200px]"
-                >
-                  <div className="relative rounded-lg shadow flex flex-col h-full min-h-full hover:scale-105 transition duration-200 ">
-                    <img
-                      src={`${process.env.REACT_APP_BACKEND}/${event.image}`}
-                      alt={event.title}
-                      className="h-60 w-full object-cover rounded "
-                    />
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/100 to-[#00000020] p-3">
-                      <h3 className="text-white text-lg font-bold drop-shadow-2xl [text-shadow:_2px_2px_4px_rgba(0,0,0,0.8)]">
-                        {event.title}
-                      </h3>
+            {hostedEvents.length === 0 ? (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>No completed events.</p>
+            ) : (
+              <Slider {...sliderSettings(hostedEvents.length)}>
+                {hostedEvents.map((event) => (
+                  <Link to={`/eventadmin/${event._id}`} key={event._id} className="block p-1">
+                    <div
+                      className="relative rounded-lg overflow-hidden transition-transform duration-200"
+                      style={{ height: 200 }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    >
+                      <img
+                        src={`${process.env.REACT_APP_BACKEND}/${event.image}`}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: "linear-gradient(to top, rgba(10,14,39,0.95) 0%, transparent 60%)" }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3
+                          className="text-sm font-semibold"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
+                          {event.title}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </Slider>
+                  </Link>
+                ))}
+              </Slider>
+            )}
           </div>
+        </div>
 
-          {/* Rankings Section */}
-          {/* <div
-            className={`col-span-12 lg:col-span-3 p-4 rounded shadow  ${
-              dark ? "bg-[#292622e3]" : "bg-[#232122]"
-            } `}
-          >
-            <h2
-              className={`lg:text-2xl md:text-xl sm:text-lg font-bold mb-4 ${
-                dark
-                  ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                  : "text-white"
-              } `}
-            >
-              User Rankings
-            </h2>
-            <ul>
-              {topranks && topranks.length > 0
-                ? topranks.map((user, index) => {
-                    const progress =
-                      (user?.weightedScore / maxWightedScore) * 100;
-                    return (
-                      <li key={user.id} className="flex items-center mb-4">
-                        <img
-                          src={`${process.env.REACT_APP_BACKEND}/${user?.userProfile?.profileImage}`}
-                          alt={user.name}
-                          className="w-12 h-12 rounded-full mr-4 object-cover"
-                        />
-                        <div className="flex-1">
-                          <p
-                            className={`font-bold lg:text-lg sm:text-base ${
-                              dark
-                                ? "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                                : "text-[#D3D3D3]"
-                            } `}
-                          >
-                            {user?.userProfile?.fullName}
-                          </p>
-                          <div className="flex items-center space-x-2">
-                            <p
-                              className={`text-sm ${
-                                dark
-                                  ? "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                                  : "text-[#D3D3D3]"
-                              } `}
-                            >
-                              Rank: {index + 1}
-                            </p>
-                            <div className="w-full bg-gray-200 h-2 rounded">
-                              <div
-                                className={`h-2 rounded ${
-                                  dark ? "bg-[#A15D66]" : "bg-[#A15D66]"
-                                } `}
-                                style={{ width: `${progress}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })
-                : "Currently we don't have top 5 players"}
-            </ul>
-            <Link
-            to="/dashboard/allranking"
-            className={`text-white font-semibold py-2 px-4 rounded mt-4 block text-center ${
-              dark
-                ? "bg-[#854951] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-white hover:text-black"
-                : "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#854951]"
-            }  `}
-          >
-            See All
-          </Link>
-          </div> */}
-           <div
-          className={`col-span-12 lg:col-span-3 p-4 rounded shadow ${
-            dark ? "bg-[#292622c4] " : "bg-[#292622c4]"
-          }`}
+        {/* Rankings */}
+        <div
+          className="col-span-12 lg:col-span-3 rounded-xl p-5 flex flex-col"
+          style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
         >
           <h2
-            className={`font-montserrat drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] lg:text-2xl md:text-xl sm:text-lg font-bold mb-4 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent`}
+            className="text-lg font-bold mb-4"
+            style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
           >
             User Rankings
           </h2>
-          <ul>
-            {topranks && topranks.length > 0
-              ? topranks.map((user, index) => {
-                  const progress =
-                    (user?.weightedScore / maxWightedScore) * 100;
-                  return (
-                    <li key={user.id} className="flex items-center mb-4">
-                      {/* Ensure the image does not shrink */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={`${process.env.REACT_APP_BACKEND}/${user?.userProfile?.profileImage}`}
-                          alt={user.name}
-                          className="w-12 h-12 rounded-full object-cover"
+          <ul className="flex-1 space-y-4">
+            {topranks.length > 0 ? (
+              topranks.map((user, index) => {
+                const progress = (user.weightedScore / maxWeightedScore) * 100;
+                return (
+                  <li key={user.id} className="flex items-center gap-3">
+                    <img
+                      src={`${process.env.REACT_APP_BACKEND}/${user?.userProfile?.profileImage}`}
+                      alt={user.name}
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      style={{ border: "1px solid rgba(0,229,255,0.2)" }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p
+                          className="text-xs font-semibold truncate"
+                          style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}
+                        >
+                          {user?.userProfile?.fullName}
+                        </p>
+                        <span
+                          className="text-xs flex-shrink-0 ml-1"
+                          style={{ color: "#00E5FF", fontFamily: "IBM Plex Mono, monospace" }}
+                        >
+                          #{index + 1}
+                        </span>
+                      </div>
+                      <div
+                        className="w-full h-1.5 rounded-full overflow-hidden"
+                        style={{ background: "rgba(75,85,99,0.3)" }}
+                      >
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${progress}%`,
+                            background: "linear-gradient(90deg, #00E5FF, #6D28D9)",
+                          }}
                         />
                       </div>
-
-                      {/* Content Section */}
-                      <div className="flex-1 min-w-0 ml-4">
-                        {/* Name and Rank in One Line */}
-                        <div className="flex items-center justify-between text-xs whitespace-nowrap overflow-hidden">
-                          {/* Allow Name to Shrink but Not Rank */}
-                          <p
-                            className={`font-bold truncate flex-1 ${
-                              dark ? "text-[#C9B796]" : "text-[#C9B796]"
-                            }`}
-                          >
-                            {user?.userProfile?.fullName}
-                          </p>
-
-                          {/* Ensure Rank is Fully Visible at the End */}
-                          <p
-                            className={`ml-2 flex-shrink-0 ${
-                              dark
-                                ? "bg-gradient-to-r text-[#C9B796]"
-                                : "text-[#C9B796]"
-                            }`}
-                          >
-                            Rank {index + 1}
-                          </p>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="flex items-center space-x-2 mt-1">
-                          <div className="w-full bg-[#69363F] h-2 rounded">
-                            <div
-                              className={`h-2 rounded ${
-                                dark ? "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] " : "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] "
-                              }`}
-                              style={{ width: `${progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })
-              : "Currently we don't have top 5 players"}
+                    </div>
+                  </li>
+                );
+              })
+            ) : (
+              <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 13 }}>
+                No rankings yet.
+              </p>
+            )}
           </ul>
           <Link
             to="/dashboard/allranking"
-            className={`text-white font-semibold py-2 px-4 rounded mt-4 block text-center ${
-              dark
-                ? "bg-[#854951] hover:bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] text-white hover:text-black"
-                : "bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] hover:bg-[#854951]"
-            }`}
+            className="btn-primary mt-4 block text-center py-2 text-sm"
           >
             See All
           </Link>
         </div>
-        </div>
+      </div>
 
-        {/* User Management Section */}
-        <div
-          className={`mt-8 backdrop-blur-sm p-4 rounded shadow-2xl shadow-gray-950 ${dark ? "bg-[#69363f18] bg-opacity-[.06]" : "bg-[#232122]"}`}
-        >
-          <div className="flex justify-between items-center mb-4">
-            <h2
-              className={`lg:text-2xl md:text-xl sm:text-lg font-bold ${
-                dark
-                  ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent"
-                  : "text-white"
-              }`}
-            >
-              Manage Users
-            </h2>
-            <Link
-              to="/dashboard/users"
-              className={`text-sm ${
-                dark
-                  ? "drop-shadow-[2px_2px_3px_rgba(0,0,0,0.6)] bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent text-[19px]"
-                  : "text-white"
-              }`}
-            >
-              See All
-            </Link>
-          </div>
-          <div className="overflow-x-auto sm:overflow-x-hidden">
-            <table className="min-w-full bg-[#232122] rounded shadow text-white">
-              <thead>
-                <tr className="bg-[#2c2c2c] ">
-                  <th className="p-2 text-left">Name</th>
-                  <th className="p-2 text-left">Email</th>
-                  <th className="p-2 text-left">Role</th>
-                  <th className="p-2 text-left">Created At</th>
-                  <th className="p-2 text-left">Profile</th>
-                  <th className="p-2 text-left">Suspension Status</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="border-[#393939] hover:bg-[#3a3a3a] transition duration-300">
-                {users.slice(0, 3).map((user) => (
-                  <tr key={user?._id}>
-                    <td className="p-2">{user?.name}</td>
-                    <td className="p-2">{user?.email}</td>
-                    <td className="p-2">{user?.role}</td>
-                    <td className="p-2">
-                      {new Date(user?.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="p-2">
-                      <button
-                        onClick={() => handleProfileView(user?.userId)}
-                        className="bg-[#be9929] hover:bg-[#838025] text-white py-1 px-4 rounded mr-2"
-                      >
-                        View Profile
-                      </button>
-                    </td>
-                    <td className="p-2">
-                      <button
-                        className="bg-[#854951] hover:bg-[#A15D66] text-white py-1 px-4 rounded mr-2"
-                        onClick={() => handleSuspend(user)}
-                      >
-                        {user.isSuspended ? "Unsuspend" : "Suspend"}
-                      </button>
-                    </td>
-                    <td className="p-2">
-                      <button
-                        className="bg-[#cf2c2c] hover:bg-[#aa2a2a] text-white py-1 px-4 rounded"
-                        onClick={() => handleDelete(user)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+      {/* User Management */}
+      <div
+        className="rounded-xl p-6"
+        style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(75,85,99,0.2)" }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2
+            className="text-xl font-bold"
+            style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+          >
+            Manage Users
+          </h2>
+          <Link
+            to="/dashboard/users"
+            className="text-sm font-medium"
+            style={{ color: "#00E5FF", fontFamily: "Inter, sans-serif" }}
+          >
+            See All →
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px]">
+            <thead>
+              <tr style={{ borderBottom: "1px solid rgba(75,85,99,0.2)" }}>
+                {["Name", "Email", "Role", "Created At", "Profile", "Status", "Actions"].map((h) => (
+                  <th
+                    key={h}
+                    className="pb-3 text-left text-xs font-semibold uppercase tracking-wider pr-4"
+                    style={{ color: "#6B7280", fontFamily: "IBM Plex Mono, monospace" }}
+                  >
+                    {h}
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {users.slice(0, 3).map((user) => (
+                <tr
+                  key={user._id}
+                  className="transition-colors"
+                  style={{ borderBottom: "1px solid rgba(75,85,99,0.1)" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.03)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                >
+                  <td className="py-3 pr-4 text-sm" style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}>{user.name}</td>
+                  <td className="py-3 pr-4 text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>{user.email}</td>
+                  <td className="py-3 pr-4 text-sm" style={{ color: "#9CA3AF" }}>{user.role}</td>
+                  <td className="py-3 pr-4 text-xs" style={{ color: "#9CA3AF", fontFamily: "IBM Plex Mono, monospace" }}>
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="py-3 pr-4">
+                    <button
+                      onClick={() => handleProfileView(user.userId)}
+                      className="text-xs px-3 py-1.5 rounded-md transition-colors"
+                      style={{
+                        background: "rgba(0,229,255,0.08)",
+                        border: "1px solid rgba(0,229,255,0.2)",
+                        color: "#00E5FF",
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.15)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.08)")}
+                    >
+                      View
+                    </button>
+                  </td>
+                  <td className="py-3 pr-4">
+                    <button
+                      onClick={() => handleSuspend(user)}
+                      className="text-xs px-3 py-1.5 rounded-md transition-colors"
+                      style={{
+                        background: user.isSuspended ? "rgba(16,185,129,0.08)" : "rgba(255,122,0,0.08)",
+                        border: user.isSuspended ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,122,0,0.25)",
+                        color: user.isSuspended ? "#10B981" : "#FF7A00",
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                    >
+                      {user.isSuspended ? "Unsuspend" : "Suspend"}
+                    </button>
+                  </td>
+                  <td className="py-3">
+                    <button
+                      onClick={() => handleDelete(user)}
+                      className="text-xs px-3 py-1.5 rounded-md transition-colors"
+                      style={{
+                        background: "rgba(239,68,68,0.08)",
+                        border: "1px solid rgba(239,68,68,0.2)",
+                        color: "#EF4444",
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.15)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && userToDelete && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#232122] p-6 rounded-lg shadow-lg max-w-md mx-4">
-              <h2 className="text-lg font-bold mb-4 text-white">
-                Confirm Deletion
-              </h2>
-              <p className="text-white mb-6">
-                Are you sure you want to delete "{userToDelete.name}"?
-              </p>
-              <p className="text-gray-300 text-sm mb-6">
-                This action cannot be undone. All user data will be permanently removed.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={cancelDelete}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
-                >
-                  Delete
-                </button>
-              </div>
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && userToDelete && (
+        <div
+          className="modal-backdrop"
+          onClick={cancelDelete}
+        >
+          <div
+            className="modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              className="text-xl font-bold mb-3"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#F8F9FA" }}
+            >
+              Confirm Deletion
+            </h2>
+            <p className="mb-2" style={{ color: "#F8F9FA", fontFamily: "Inter, sans-serif" }}>
+              Delete <strong>"{userToDelete.name}"</strong>?
+            </p>
+            <p className="text-sm mb-6" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 rounded-lg text-sm font-medium"
+                style={{
+                  background: "rgba(75,85,99,0.2)",
+                  border: "1px solid rgba(75,85,99,0.3)",
+                  color: "#9CA3AF",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-lg text-sm font-medium"
+                style={{
+                  background: "rgba(239,68,68,0.12)",
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  color: "#EF4444",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <Modal isOpen={isModalOpen} onClose={closeModal} profile={profile} />
-      </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} profile={profile} />
     </div>
   );
 };
