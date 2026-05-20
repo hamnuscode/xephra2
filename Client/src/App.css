@@ -78,11 +78,25 @@
   100% { background-position: 60px 60px; }
 }
 
+/* GPU-composited variant — translate instead of background-position */
+@keyframes gridScrollTransform {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(60px, 60px); }
+}
+
 @keyframes scanLine {
   0%   { transform: translateY(-100%); opacity: 0; }
   10%  { opacity: 0.6; }
   90%  { opacity: 0.6; }
   100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Glitch-free variant: px only, clipped by parent overflow:hidden */
+@keyframes scanLinePx {
+  0%   { transform: translateY(-4px); opacity: 0; }
+  5%   { opacity: 0.5; }
+  95%  { opacity: 0.5; }
+  100% { transform: translateY(520px); opacity: 0; }
 }
 
 @keyframes rotateCube {
@@ -101,8 +115,8 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 0.3; box-shadow: 0 0 8px rgba(0,229,255,0.3); }
-  50%       { opacity: 0.8; box-shadow: 0 0 20px rgba(0,229,255,0.6); }
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.8; }
 }
 
 @keyframes orbitRing {

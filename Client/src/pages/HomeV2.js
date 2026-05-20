@@ -157,18 +157,27 @@ const HomeV2 = () => {
         className="relative min-h-[92vh] flex items-center px-6 overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0A0E27 0%, #0d1245 40%, #0A0E27 100%)", borderBottom: "1px solid #1E2A3A" }}
       >
-        {/* Animated grid background */}
+        {/* Animated grid background — uses transform:translate (GPU-composited, no repaints) */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(0,229,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.045) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-            animation: "gridScroll 8s linear infinite",
+            inset: "-60px",
             pointerEvents: "none",
+            overflow: "hidden",
           }}
-        />
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+              willChange: "transform",
+              animation: "gridScrollTransform 8s linear infinite",
+            }}
+          />
+        </div>
         {/* Edge fade */}
         <div
           style={{
