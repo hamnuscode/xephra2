@@ -199,7 +199,7 @@ const eventsSlice = createSlice({
       })
       .addCase(getEvents.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = action.payload;
+        state.events = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(getEvents.rejected, (state, action) => {
         state.loading = false;
@@ -276,7 +276,7 @@ const eventsSlice = createSlice({
       })
       .addCase(getEventsByUserId.fulfilled, (state, action) => {
         state.loading = false;
-        state.participants = action.payload; 
+        state.participants = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(getEventsByUserId.rejected, (state, action) => {
         state.loading = false;
@@ -311,7 +311,7 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchHostedTournaments.fulfilled, (state, action) => {
         state.loading = false;
-        state.hostedEvents = action.payload;
+        state.hostedEvents = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchHostedTournaments.rejected, (state, action) => {
         state.loading = false;

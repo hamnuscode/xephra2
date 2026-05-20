@@ -53,9 +53,9 @@ const DashboardUser = ({ setActiveMenu }) => {
     dispatch(getTopRanking());
   }, []);
 
-  const sortedUpcomingEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
-  const sortedRegisteredEvents = [...participants].sort((a, b) => new Date(a.date) - new Date(b.date));
-  const maxWeightedScore = Math.max(...topranks.map((u) => u.weightedScore), 1);
+  const sortedUpcomingEvents = [...(Array.isArray(events) ? events : [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedRegisteredEvents = [...(Array.isArray(participants) ? participants : [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const maxWeightedScore = Math.max(...(Array.isArray(topranks) ? topranks : []).map((u) => u.weightedScore), 1);
 
   return (
     <div className="space-y-6">

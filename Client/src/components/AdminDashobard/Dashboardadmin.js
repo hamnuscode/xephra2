@@ -77,7 +77,7 @@ const DashboardAdmin = ({ setActiveMenu }) => {
     if (error && !loading) toast.error(error);
   }, [error, loading]);
 
-  const maxWeightedScore = Math.max(...topranks.map((u) => u.weightedScore), 1);
+  const maxWeightedScore = Math.max(...(Array.isArray(topranks) ? topranks : []).map((u) => u.weightedScore), 1);
 
   const analyticsData = {
     labels: ["January", "February", "March", "April", "May", "June"],

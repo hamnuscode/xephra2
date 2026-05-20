@@ -13,7 +13,7 @@ const UpcomingTournaments = () => {
 
   const API_BASE_URL = process.env.REACT_APP_BACKEND;
 
-  const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedEvents = [...(Array.isArray(events) ? events : [])].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <section className="py-24 px-6" style={{ background: "#0A0E27" }}>

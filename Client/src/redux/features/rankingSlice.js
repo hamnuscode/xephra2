@@ -269,7 +269,7 @@ const rankingSlice = createSlice({
       })
       .addCase(getTopRanking.fulfilled, (state, action) => {
         state.loading = false;
-        state.topranks = action.payload;
+        state.topranks = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(getTopRanking.rejected, (state, action) => {
         state.loading = false;
