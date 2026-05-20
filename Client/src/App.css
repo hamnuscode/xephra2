@@ -104,6 +104,16 @@
   100% { transform: rotateX(360deg) rotateY(240deg) rotateZ(120deg); }
 }
 
+/* Glitch-free 2D spin — no 3D face overlap */
+@keyframes spinZ {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes spinZFrom45 {
+  from { transform: rotate(45deg); }
+  to   { transform: rotate(405deg); }
+}
+
 @keyframes floatUp {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   50%       { transform: translateY(-18px) rotate(6deg); }
