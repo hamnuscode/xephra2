@@ -51,7 +51,7 @@ const HomeV2 = () => {
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
-            <img src={logo} alt="Xephra" className="h-8 w-auto" />
+            <img src={logo} alt="Rival" className="h-8 w-auto" />
           </Link>
 
           {/* Nav — desktop */}

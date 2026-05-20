@@ -3,19 +3,19 @@ import { IoMoonSharp } from "react-icons/io5";
 import { ImBrightnessContrast } from "react-icons/im";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { FiBell } from "react-icons/fi";
-import logo from "../../assets/xephra logo-01.png";
 const apiUrl = process.env.REACT_APP_BACKEND;
 
 const Header = ({ profile, userData, settings, toggleTheme, toggleSideMenu }) => {
   return (
     <div className={`flex justify-between items-center mb-0 m-0 p-4`}>
       <div className="flex items-center space-x-2">
-        {/* Logo - Always visible on large screens */}
-        <img
-          src={logo}
-          className="h-13 w-44 md:block hidden"
-          alt="Flowbite Logo"
-        />
+        {/* Brand name */}
+        <span
+          className="md:block hidden text-lg font-bold tracking-widest"
+          style={{ fontFamily: "IBM Plex Mono, monospace", color: "#00E5FF" }}
+        >
+          RIVAL
+        </span>
 
         {/* Menu Button - Only visible on small screens */}
         <button

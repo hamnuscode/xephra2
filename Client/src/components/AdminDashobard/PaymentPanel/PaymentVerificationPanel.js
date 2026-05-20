@@ -1966,30 +1966,59 @@ const PaymentVerificationPanel = () => {
   ];
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen text-white">
+    <div className="p-6 min-h-screen text-white" style={{ background: "#0A0E27", fontFamily: "Inter, sans-serif" }}>
       <div className="flex items-center space-x-2 p-4">
-        <ArrowLeft className="w-5 h-5 text-fuchsia-400" />
+        <ArrowLeft className="w-5 h-5" style={{ color: "#00E5FF" }} />
         <Link
           to="/dashboard"
-          className="text-fuchsia-400 hover:text-fuchsia-300 font-medium"
+          className="font-medium transition-colors"
+          style={{ color: "#00E5FF" }}
+          onMouseEnter={(e) => (e.target.style.textDecoration = "underline")}
+          onMouseLeave={(e) => (e.target.style.textDecoration = "none")}
         >
           Back to Dashboard
         </Link>
       </div>
-      <h1 className="text-3xl font-bold mb-6 text-center text-fuchsia-400 drop-shadow-lg">
-        Payment Verification Panel
-      </h1>
 
-      <div className="flex justify-center gap-4 mb-6 flex-wrap">
+      <div className="mb-8 px-4">
+        <div
+          className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+          style={{
+            background: "rgba(0,229,255,0.08)",
+            border: "1px solid rgba(0,229,255,0.2)",
+            color: "#00E5FF",
+            fontFamily: "IBM Plex Mono, monospace",
+          }}
+        >
+          Admin Panel
+        </div>
+        <h1
+          className="text-3xl font-bold"
+          style={{ color: "#F8F9FA", fontFamily: "Poppins, sans-serif", letterSpacing: "-0.02em" }}
+        >
+          Payment Verification
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "#6B7280" }}>
+          Review and approve player subscription payments
+        </p>
+      </div>
+
+      <div className="flex justify-center gap-3 mb-6 flex-wrap px-4">
         {statusButtons.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => handleStatusFilterChange(value)}
-            className={`px-4 py-2 rounded-md border text-sm font-semibold transition-all duration-300 ${
-              statusFilter === value
-                ? "bg-fuchsia-600 border-fuchsia-400 text-white"
-                : "bg-gray-700 border-gray-600 hover:bg-fuchsia-700 hover:border-fuchsia-400"
-            }`}
+            className="px-4 py-2 rounded-md text-sm font-semibold transition-all duration-150"
+            style={{
+              background: statusFilter === value
+                ? "#00E5FF"
+                : "rgba(0,229,255,0.08)",
+              border: statusFilter === value
+                ? "1px solid #00E5FF"
+                : "1px solid rgba(0,229,255,0.2)",
+              color: statusFilter === value ? "#0A0E27" : "#00E5FF",
+              fontFamily: "IBM Plex Mono, monospace",
+            }}
           >
             {label}
           </button>

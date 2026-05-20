@@ -2,7 +2,6 @@ import React from "react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
-import logo from "../../assets/xephra logo-01.png";
 
 const ChatArea = ({
   settings,
@@ -48,22 +47,18 @@ const ChatArea = ({
       ) : (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <img
-              src={logo}
-              alt="XEPHRA"
-              className="mx-auto mb-4 w-1/3 h-auto"
-            />
-            <h2
-              className="text-4xl font-bold mb-2"
-              style={{
-                background:
-                  "linear-gradient(90deg, #D19F43 4.4%, #B2945C 24.9%, #C9B796 42.9%, #B39867 55.9%, #D5AD66 89%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
+            <div
+              className="text-5xl font-bold mb-4 tracking-widest"
+              style={{ fontFamily: "IBM Plex Mono, monospace", color: "#00E5FF", opacity: 0.4 }}
+            >
+              RIVAL
+            </div>
+            <p
+              className="text-lg font-medium"
+              style={{ color: "#6B7280", fontFamily: "Inter, sans-serif" }}
             >
               Select a chat to start messaging
-            </h2>
+            </p>
           </div>
         </div>
       )}

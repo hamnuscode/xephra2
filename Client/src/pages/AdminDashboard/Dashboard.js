@@ -9,6 +9,8 @@ import logo from "../../assets/xephra logo-01.png";
 import AdminProfile from "../../components/AdminDashobard/AdminProfile";
 import AdminNotificationPanel from "../../components/Notifications/AdminNotificationPanel";
 import NotificationDebug from "../../components/Notifications/NotificationDebug";
+import PaymentVerificationPanel from "../../components/AdminDashobard/PaymentPanel/PaymentVerificationPanel";
+import ChatSystem from "../../components/ChatSystem";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
@@ -44,13 +46,7 @@ function Sidebar({ onMenuClick, activeMenu }) {
           {menuItems.map((item) => (
             <li key={item.key}>
               <button
-                onClick={() => {
-                  if (item.key === "PaymentPanel") {
-                    navigate("/payment-verification-panel");
-                  } else {
-                    onMenuClick(item.key);
-                  }
-                }}
+                onClick={() => onMenuClick(item.key)}
                 className="sidebar-item w-full"
                 style={activeMenu === item.key ? {
                   color: "#00E5FF",
@@ -62,30 +58,24 @@ function Sidebar({ onMenuClick, activeMenu }) {
               </button>
             </li>
           ))}
+          <li>
+            <button
+              onClick={() => onMenuClick("chat")}
+              className="sidebar-item w-full"
+              style={activeMenu === "chat" ? {
+                color: "#00E5FF",
+                borderLeftColor: "#00E5FF",
+                background: "rgba(0, 229, 255, 0.08)",
+              } : {}}
+            >
+              <span>Chat System</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
       {/* Bottom Actions */}
       <div className="px-5 pb-8 space-y-3" style={{ borderTop: "1px solid rgba(75,85,99,0.15)", paddingTop: "20px" }}>
-        <Link to="/dashboard/chats" className="block">
-          <button
-            className="w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-150"
-            style={{
-              background: "rgba(0,229,255,0.08)",
-              border: "1px solid rgba(0,229,255,0.25)",
-              color: "#00E5FF",
-              fontFamily: "Inter, sans-serif",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(0,229,255,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(0,229,255,0.08)";
-            }}
-          >
-            Chat System
-          </button>
-        </Link>
         <button
           onClick={logoutSubmit}
           className="w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-150"
@@ -156,6 +146,8 @@ function Dashboard() {
       case "rankingApproval": return <RankingApproval dark={dark} />;
       case "notifications": return <div><NotificationDebug /><AdminNotificationPanel /></div>;
       case "adminProfile": return <AdminProfile dark={dark} profile={profile} />;
+      case "PaymentPanel": return <PaymentVerificationPanel />;
+      case "chat": return <ChatSystem inline />;
       default: return <Dashboardadmin setActiveMenu={setActiveMenu} dark={dark} />;
     }
   };

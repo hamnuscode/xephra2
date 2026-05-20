@@ -8,7 +8,7 @@ import useSocket from "./ChatSystem/Hooks/useSocket";
 import useScrollHandling from "./ChatSystem/Hooks/useScrollHanding";
 import Sidebar from "./ChatSystem/Sidebar";
 
-const ChatSystem = () => {
+const ChatSystem = ({ inline = false }) => {
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
   const { chatGroups, loading, activeChat, messages, hasMore, oldestMessageTimestamp, messagesLoading } = useSelector((state) => state.chatGroups);
@@ -121,6 +121,55 @@ const ChatSystem = () => {
     return () => document.removeEventListener("mousedown", closeSideMenu);
   }, []);
 
+  if (inline) {
+    return (
+      <div className="flex h-full" style={{ minHeight: 0 }}>
+        <Sidebar
+          sideMenuRef={sideMenuRef}
+          settings={settings}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filteredChatGroups={filteredChatGroups}
+          activeChat={activeChat}
+          loading={loading}
+          unreadMessages={unreadMessages}
+          handleSelectChat={(group) => {
+            const { setActiveChat, fetchMessages, fetchSingleMessages } = require("../redux/features/ChatsSlice");
+            if (activeChat && window.socket && socketConnected) {
+              window.socket.emit("leaveChat", activeChat._id);
+            }
+            dispatch(setActiveChat(group));
+            if (group.isAdminChat) {
+              dispatch(fetchSingleMessages(group._id));
+            } else {
+              dispatch(fetchMessages(group._id));
+            }
+            if (unreadMessages[group._id]) {
+              setUnreadMessages(prev => ({...prev, [group._id]: 0}));
+            }
+            if (window.socket && socketConnected) {
+              setTimeout(() => {
+                window.socket.emit("joinChat", group._id);
+              }, 200);
+            }
+          }}
+        />
+        <ChatArea
+          settings={settings}
+          activeChat={activeChat}
+          messages={messages}
+          messagesContainerRef={messagesContainerRef}
+          handleScroll={handleScroll}
+          userId={userId}
+          message={message}
+          setMessage={setMessage}
+          sendMessage={sendMessage}
+          socketConnected={socketConnected}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen">
       {/* Background with overlay */}
@@ -137,12 +186,12 @@ const ChatSystem = () => {
 
       <div className="relative z-10 flex flex-col h-screen">
         {/* Header */}
-        <Header 
-          profile={profile} 
-          userData={userData} 
-          settings={settings} 
-          toggleTheme={toggleTheme} 
-          toggleSideMenu={toggleSideMenu} 
+        <Header
+          profile={profile}
+          userData={userData}
+          settings={settings}
+          toggleTheme={toggleTheme}
+          toggleSideMenu={toggleSideMenu}
         />
 
         {/* Main Content */}

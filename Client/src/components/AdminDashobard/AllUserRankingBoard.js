@@ -1,34 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-} from "chart.js";
-import { Doughnut } from "react-chartjs-2";
-import { Bar } from "react-chartjs-2";
 import { fetchUserStats } from "../../redux/features/rankingSlice";
 import { getUser } from "../../redux/features/profileSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../utils/Loading/Loading";
 import Modal from "./Modal";
 
-// Register the required Chart.js components
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
-
-const AllUserRankingBoard = ({ dark }) => {
+const AllUserRankingBoard = () => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.ranking);
+  const { users, loading } = useSelector((state) => state.ranking);
   const { profile } = useSelector((state) => state.profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -42,108 +21,197 @@ const AllUserRankingBoard = ({ dark }) => {
     dispatch(getUser(userId));
     setIsModalOpen(true);
   };
-  const closeModal = () => {
-    setIsModalOpen(false);
+
+  if (loading) return <Loading />;
+
+  const maxScore = userData ? Math.max(...userData.map((u) => u.weightedScore || 0), 1) : 1;
+
+  const medalColor = (i) => {
+    if (i === 0) return "#FFD700";
+    if (i === 1) return "#C0C0C0";
+    if (i === 2) return "#CD7F32";
+    return "#00E5FF";
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  const doughnutData = (progress) => ({
-    datasets: [
-      {
-        data: [progress, 100 - progress],
-        backgroundColor: ["#854951", "#e5e7eb"],
-        borderWidth: 0,
-      },
-    ],
-  });
-
-  const maxWightedScore = userData &&  Math.max(...userData.map((user) => user.weightedScore)
-  );
-
   return (
-    <div className="min-h-screen p-8 bg-[#875441] shadow-2xl shadow-gray-950  backdrop-blur-sm">
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 bg-gradient-to-r from-[#D19F43] via-[#d1a759] to-[#eb9a0d] bg-clip-text text-transparent">
-        Xephra Users Ranking Board
-      </h1>
-
-      <div className="grid">
-        {/* Top Players Section */}
-        <div className="bg-gradient-to-r from-[#D19F43] via-[#B2945C] via-[#C9B796] via-[#B39867] to-[#D4AD66] shadow-md rounded-lg p-6">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-center text-[#622D37]">
-            All Players
-          </h2>
-
-          <div className="p-4 sm:p-6 space-y-6">
-            {userData &&
-              userData.map((item, ind) => {
-                const progress = (item?.weightedScore / maxWightedScore) * 100;
-
-                return (
-                  <div
-                    key={item._id}
-                    className="bg-[#87544178] shadow-md rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4"
-                  >
-                    <img
-                      src={`${process.env.REACT_APP_BACKEND}/${item?.userProfile?.profileImage}`}
-                      alt={item?.userProfile?.fullName}
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover"
-                    />
-                    <div className="flex flex-col sm:flex-row justify-between items-center w-full space-y-4 sm:space-y-0 sm:space-x-4">
-                      <div className="text-center sm:text-left flex flex-col md:flex-row space-y-2">
-                       <div >
-                       <h2 className="text-lg sm:text-xl font-bold text-gray-800">
-                          {item?.userProfile?.fullName}
-                        </h2>
-                        {/* Progress Bar */}
-                        <div className="flex items-center space-x-2 mt-1">
-                          <div className="w-full bg-[#69363F] h-2 rounded">
-                            <div
-                              className={`h-2 rounded ${
-                                dark ? "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] " : "bg-gradient-to-r from-[#AE8D52] via-[#BCA477] via-[#C6b492] via-[#B69A66] to-[#CBA766] "
-                              }`}
-                              style={{ width: `${progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <p className="text-sm sm:text-base text-black">
-                          Total Points: {item?.weightedScore}
-                        </p>
-                        <p className="text-sm sm:text-base text-black">
-                          Rank: {ind + 1}
-                        </p>
-                        </div>
-                        {/* <div className="w-16">
-                        <Doughnut
-                          data={doughnutData(progress)}
-                          options={{
-                            cutout: "80%",
-                            plugins: {
-                              tooltip: { enabled: false },
-                            },
-                          }}
-                        />
-                      </div> */}
-                      </div>
-                     
-                      <div className="flex justify-center sm:justify-end w-full sm:w-auto">
-                        <button
-                          onClick={() => handleProfileView(item?.userId)}
-                          className="bg-[#854951] hover:bg-[#A15D66] text-white py-1 px-4 rounded mr-2"
-                        >
-                          View Profile
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
+    <div
+      className="min-h-screen p-6"
+      style={{ background: "#0A0E27", fontFamily: "Inter, sans-serif" }}
+    >
+      {/* Header */}
+      <div className="mb-8">
+        <div
+          className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+          style={{
+            background: "rgba(0,229,255,0.08)",
+            border: "1px solid rgba(0,229,255,0.2)",
+            color: "#00E5FF",
+            fontFamily: "IBM Plex Mono, monospace",
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "#00E5FF",
+              display: "inline-block",
+              animation: "pulseGlow 2s ease-in-out infinite",
+            }}
+          />
+          Live Rankings
         </div>
-        <Modal isOpen={isModalOpen} onClose={closeModal} profile={profile} />
+        <h1
+          className="text-3xl font-bold"
+          style={{ color: "#F8F9FA", fontFamily: "Poppins, sans-serif", letterSpacing: "-0.02em" }}
+        >
+          Rival Users Ranking Board
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "#6B7280" }}>
+          All-time leaderboard based on weighted tournament scores
+        </p>
       </div>
+
+      {/* Table header */}
+      <div
+        className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 mb-2 rounded-md text-xs font-semibold tracking-widest uppercase"
+        style={{
+          color: "#6B7280",
+          fontFamily: "IBM Plex Mono, monospace",
+          borderBottom: "1px solid rgba(75,85,99,0.2)",
+        }}
+      >
+        <div className="col-span-1 text-center">#</div>
+        <div className="col-span-5">Player</div>
+        <div className="col-span-4">Score Progress</div>
+        <div className="col-span-1 text-right">Pts</div>
+        <div className="col-span-1 text-right">Action</div>
+      </div>
+
+      {/* Player rows */}
+      <div className="space-y-2">
+        {userData && userData.map((item, ind) => {
+          const progress = (item.weightedScore / maxScore) * 100;
+          const color = medalColor(ind);
+
+          return (
+            <div
+              key={item._id}
+              className="grid grid-cols-12 gap-4 items-center px-4 py-4 rounded-lg transition-all duration-150"
+              style={{
+                background: ind < 3
+                  ? `rgba(0,229,255,0.04)`
+                  : "rgba(15,23,42,0.6)",
+                border: ind < 3
+                  ? `1px solid rgba(0,229,255,0.12)`
+                  : "1px solid rgba(75,85,99,0.15)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(0,229,255,0.25)";
+                e.currentTarget.style.background = "rgba(0,229,255,0.06)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = ind < 3
+                  ? "rgba(0,229,255,0.12)"
+                  : "rgba(75,85,99,0.15)";
+                e.currentTarget.style.background = ind < 3
+                  ? "rgba(0,229,255,0.04)"
+                  : "rgba(15,23,42,0.6)";
+              }}
+            >
+              {/* Rank */}
+              <div className="col-span-1 text-center">
+                <span
+                  className="text-lg font-bold"
+                  style={{ color, fontFamily: "IBM Plex Mono, monospace" }}
+                >
+                  {ind < 3 ? ["🥇", "🥈", "🥉"][ind] : `#${ind + 1}`}
+                </span>
+              </div>
+
+              {/* Player info */}
+              <div className="col-span-5 flex items-center gap-3">
+                <img
+                  src={
+                    item?.userProfile?.profileImage
+                      ? `${process.env.REACT_APP_BACKEND}/${item.userProfile.profileImage}`
+                      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvyKxD07vzVrTXqVFK0myyV8KT99ZWBNNwGA&s"
+                  }
+                  alt={item?.userProfile?.fullName}
+                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                  style={{ border: `2px solid ${color}40` }}
+                />
+                <div>
+                  <div className="font-semibold text-sm" style={{ color: "#F8F9FA" }}>
+                    {item?.userProfile?.fullName || "Unknown Player"}
+                  </div>
+                  <div className="text-xs" style={{ color: "#6B7280" }}>
+                    Rank {ind + 1}
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="col-span-4">
+                <div
+                  className="h-1.5 rounded-full overflow-hidden"
+                  style={{ background: "rgba(75,85,99,0.3)" }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${progress}%`,
+                      background: `linear-gradient(90deg, ${color}, ${color}99)`,
+                    }}
+                  />
+                </div>
+                <div className="text-xs mt-1" style={{ color: "#6B7280", fontFamily: "IBM Plex Mono, monospace" }}>
+                  {Math.round(progress)}%
+                </div>
+              </div>
+
+              {/* Score */}
+              <div className="col-span-1 text-right">
+                <span
+                  className="text-sm font-bold"
+                  style={{ color, fontFamily: "IBM Plex Mono, monospace" }}
+                >
+                  {item?.weightedScore ?? 0}
+                </span>
+              </div>
+
+              {/* Action */}
+              <div className="col-span-1 text-right">
+                <button
+                  onClick={() => handleProfileView(item?.userId)}
+                  className="text-xs px-2 py-1 rounded transition-all duration-150"
+                  style={{
+                    background: "rgba(0,229,255,0.08)",
+                    border: "1px solid rgba(0,229,255,0.2)",
+                    color: "#00E5FF",
+                    fontFamily: "IBM Plex Mono, monospace",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.15)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,229,255,0.08)")}
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {!userData || userData.length === 0 ? (
+        <div
+          className="text-center py-16"
+          style={{ color: "#6B7280", fontFamily: "IBM Plex Mono, monospace" }}
+        >
+          No ranking data available yet.
+        </div>
+      ) : null}
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} profile={profile} />
     </div>
   );
 };
