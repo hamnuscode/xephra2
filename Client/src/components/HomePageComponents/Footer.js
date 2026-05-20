@@ -11,7 +11,7 @@ import {
   X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import logo from "../../assets/rival logo-01.png";
+import logo from "../../assets/xephra logo-01.png";
 
 const Footer = ({ handleNavClick }) => {
   const [activePolicy, setActivePolicy] = useState(null);
