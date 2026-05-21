@@ -6,6 +6,9 @@ const nodemailer = require("nodemailer");
 const AdminChatGroup = require("../models/AdminChatGroup")
 const { transporter } = require("../config/emailConfig");
 
+const primaryFrontendUrl = () =>
+  (process.env.FRONTEND_URL || "http://localhost:3000").split(",")[0].trim();
+
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -22,7 +25,7 @@ const generateToken = (user) => {
 
 // Send verification email function using Gmail SMTP
 const sendVerificationEmail = async (user, verificationToken) => {
-  const verificationUrl = `${process.env.FRONTEND_URL || 'https://xephra.net'}/verify-email/${verificationToken}`;
+  const verificationUrl = `${primaryFrontendUrl()}/verify-email/${verificationToken}`;
   
   const mailOptions = {
     from: `"Xephra" <${process.env.EMAIL_USER}>`, // sender address
@@ -278,7 +281,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
     // const resetUrl = `http://localhost:3000/reset/${resetToken}`;
     // Or for production:
-    const resetUrl = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
+    const resetUrl = `${primaryFrontendUrl()}/reset/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",

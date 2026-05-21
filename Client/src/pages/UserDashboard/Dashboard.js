@@ -24,7 +24,7 @@ function Sidebar({ onMenuClick, activeMenu }) {
 
   const logoutSubmit = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/");
   };
 
   return (

@@ -7,30 +7,35 @@ router.post("/signup", signup);
 router.post("/login", Login);
 router.post("/forgot", forgot);
 router.post("/reset/:token", reset);
-router.get("/google",passport.authenticate("google", { scope: ["profile", "email"] }));
-router.get(
+
+const googleEnabled = Boolean(
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.CALLBACKURL
+);
+
+if (googleEnabled) {
+  router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+  router.get(
     "/google/callback",
     passport.authenticate("google", { session: false, failureRedirect: "/login" }),
     (req, res) => {
       const { user, token } = req.user;
-  
-      // Prepare user data to send to frontend
       const userData = {
         name: user.name,
         UserId: user.userId,
         email: user.email,
         role: user.role,
-        token: token, // Include token for authentication
+        token: token,
       };
-  
-      // Redirect to frontend with user data
-      res.redirect(
-        `https://xephra.net/google-success?data=${encodeURIComponent(
-          JSON.stringify(userData)
-        )}`
-      );
+      const frontend = (process.env.FRONTEND_URL || "http://localhost:3000").split(",")[0].trim();
+      res.redirect(`${frontend}/google-success?data=${encodeURIComponent(JSON.stringify(userData))}`);
     }
   );
+} else {
+  const disabledHandler = (req, res) =>
+    res.status(503).json({ message: "Google OAuth is not configured on this server" });
+  router.get("/google", disabledHandler);
+  router.get("/google/callback", disabledHandler);
+}
 
 
 // New email verification routes

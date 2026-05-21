@@ -64,10 +64,6 @@ const Login = () => {
     });
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "https://api.xephra.net/auth/google";
-  };
-
   if (loading) return <Loading />;
 
   return (
@@ -79,7 +75,7 @@ const Login = () => {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link to="/">
-            <img src={logo} alt="Rival" className="h-10 w-auto" />
+            <img src={logo} alt="Xephra" className="h-10 w-auto" />
           </Link>
         </div>
 
@@ -170,45 +166,6 @@ const Login = () => {
               {message}
             </p>
           )}
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-grow" style={{ borderTop: "1px solid rgba(75,85,99,0.3)" }} />
-            <span className="px-3 text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>OR</span>
-            <div className="flex-grow" style={{ borderTop: "1px solid rgba(75,85,99,0.3)" }} />
-          </div>
-
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-150"
-            style={{
-              background: "rgba(75,85,99,0.15)",
-              border: "1px solid rgba(75,85,99,0.3)",
-              color: "#F8F9FA",
-              fontFamily: "Inter, sans-serif",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(75,85,99,0.25)";
-              e.currentTarget.style.borderColor = "rgba(0,229,255,0.2)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(75,85,99,0.15)";
-              e.currentTarget.style.borderColor = "rgba(75,85,99,0.3)";
-            }}
-          >
-            <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" className="w-5 h-5" />
-            Continue with Google
-          </button>
-
-          {/* Demo credentials */}
-          <div
-            className="mt-6 p-4 rounded-lg text-xs space-y-1"
-            style={{ background: "rgba(0,229,255,0.05)", border: "1px solid rgba(0,229,255,0.15)", fontFamily: "IBM Plex Mono, monospace", color: "#9CA3AF" }}
-          >
-            <p style={{ color: "#00E5FF", marginBottom: 6, fontSize: 11, letterSpacing: "0.05em" }}>DEMO CREDENTIALS</p>
-            <p><span style={{ color: "#F8F9FA" }}>Admin</span> — admin@rival.com / Admin@123</p>
-            <p><span style={{ color: "#F8F9FA" }}>User</span>  — user@rival.com / User@123</p>
-          </div>
 
           <div className="mt-6 space-y-2 text-center">
             <p className="text-sm" style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif" }}>

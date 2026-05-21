@@ -5,16 +5,18 @@ const AdminMessageModel = require("../models/AdminMessage");
 const { NotificationService } = require("../controllers/notificationController");
 
 const socketSetup = (server) => {
+  const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   const io = new Server(server, {
     cors: {
-    // origin: "https://xephra.net", // Update with your frontend URL
-      // origin: "https://xephra-two.vercel.app",
-      origin: "http://xephra.net",
-      // origin: ["http://localhost:3000", "http://127.0.0.1:5500", "http://localhost:5500"],
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
       credentials: true
     },
-    transports: ["websocket", "polling"]  
+    transports: ["websocket", "polling"]
   });
 
   // Initialize notification service with socket.io instance
